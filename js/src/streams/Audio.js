@@ -1,4 +1,4 @@
-import { StreamModel } from "./webrtc";
+import { StreamModel } from "./Webrtc";
 
 export class AudioStreamModel extends StreamModel {
   defaults() {
