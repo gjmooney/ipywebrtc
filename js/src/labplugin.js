@@ -1,15 +1,17 @@
-const jupyter_webrtc = require('./index');
-const base = require('@jupyter-widgets/base');
+import { IJupyterWidgetRegistry } from "@jupyter-widgets/base";
+import { version } from "../package.json";
 
-module.exports = {
-  id: 'jupyter-webrtc',
-  requires: [base.IJupyterWidgetRegistry],
-  activate: function(app, widgets) {
-      widgets.registerWidget({
-          name: 'jupyter-webrtc',
-          version: jupyter_webrtc.version,
-          exports: jupyter_webrtc
-      });
+const extension = {
+  id: "jupyter-webrtc",
+  requires: [IJupyterWidgetRegistry],
+  activate: (app, widgets) => {
+    widgets.registerWidget({
+      name: "jupyter-webrtc",
+      version: version,
+      exports: async () => import("./index"),
+    });
   },
-  autoStart: true
+  autoStart: true,
 };
+
+export default extension;
