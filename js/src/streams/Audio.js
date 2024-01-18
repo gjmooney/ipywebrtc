@@ -1,6 +1,6 @@
 import { DOMWidgetView, unpack_models } from "@jupyter-widgets/base";
 import { RecorderModel, RecorderView } from "./Recorder";
-import { StreamModel } from "./Webrtc";
+import { StreamModel } from "./Media";
 
 export class AudioStreamModel extends StreamModel {
   defaults() {

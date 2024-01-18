@@ -1,7 +1,7 @@
 import { unpack_models } from "@jupyter-widgets/base";
 import * as utils from "../utils";
+import { MediaStreamModel } from "./Media";
 import { RecorderModel, RecorderView } from "./Recorder";
-import { MediaStreamModel } from "./Webrtc";
 
 const captureStream = function (widget) {
   if (widget.captureStream) {

@@ -1,6 +1,6 @@
 import { unpack_models } from "@jupyter-widgets/base";
+import { StreamModel } from "./Media";
 import { RecorderModel, RecorderView } from "./Recorder";
-import { StreamModel } from "./Webrtc";
 
 export class VideoStreamModel extends StreamModel {
   defaults() {

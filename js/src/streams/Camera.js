@@ -1,4 +1,4 @@
-import { MediaStreamModel } from "./Webrtc";
+import { MediaStreamModel } from "./Media";
 
 export class CameraStreamModel extends MediaStreamModel {
   defaults() {

@@ -1,6 +1,6 @@
 import { unpack_models } from "@jupyter-widgets/base";
 import * as html2canvas from "html2canvas";
-import { MediaStreamModel, MediaStreamView } from "./Webrtc";
+import { MediaStreamModel, MediaStreamView } from "./Media";
 
 export class WidgetStreamModel extends MediaStreamModel {
   defaults() {
