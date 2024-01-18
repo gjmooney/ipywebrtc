@@ -1,4 +1,5 @@
 import { DOMWidgetView, unpack_models } from "@jupyter-widgets/base";
+import { RecorderModel, RecorderView } from "./Recorder";
 import { StreamModel } from "./Webrtc";
 
 export class AudioStreamModel extends StreamModel {
@@ -52,6 +53,37 @@ export class AudioStreamView extends DOMWidgetView {
       this.audio.pause();
       this.audio.srcObject = null;
     });
-    return widgets.super.remove.apply(this, arguments);
+    return super.remove.apply(this, arguments);
+  }
+}
+
+export class AudioRecorderModel extends RecorderModel {
+  defaults() {
+    return {
+      ...super.defaults(),
+      _model_name: "AudioRecorderModel",
+      _view_name: "AudioRecorderView",
+      audio: null,
+    };
+  }
+
+  initialize() {
+    super.initialize.apply(this, arguments);
+    window.last_audio_recorder = this;
+
+    this.type = "audio";
+  }
+}
+
+AudioRecorderModel.serializers = {
+  ...RecorderModel.serializers,
+  audio: { deserialize: unpack_models },
+};
+
+export class AudioRecorderView extends RecorderView {
+  initialize() {
+    super.initialize.apply(this, arguments);
+    this.tag = "audio";
+    this.recordIconClass = "fa fa-circle";
   }
 }
