@@ -1,3 +1,4 @@
+import { DOMWidgetView, unpack_models } from "@jupyter-widgets/base";
 import { StreamModel } from "./Webrtc";
 
 export class AudioStreamModel extends StreamModel {
@@ -20,10 +21,10 @@ export class AudioStreamModel extends StreamModel {
 
 AudioStreamModel.serializers = {
   ...StreamModel.serializers,
-  audio: { deserialize: widgets.unpack_models },
+  audio: { deserialize: unpack_models },
 };
 
-export class AudioStreamView extends widgets.DOMWidgetView {
+export class AudioStreamView extends DOMWidgetView {
   render() {
     super.render.apply(this, arguments);
     window.last_audio_stream_view = this;
