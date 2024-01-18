@@ -7,7 +7,6 @@ require("webrtc-adapter");
 window.ws = global.WebSocket;
 
 import * as mqtt from "mqtt";
-import * as utils from "../utils";
 const semver_range = "~" + require("../../package.json").version;
 
 export class WebRTCRoomModel extends widgets.DOMWidgetModel {
