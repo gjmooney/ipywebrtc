@@ -11,7 +11,7 @@ import ipywebrtc._version
 import traitlets
 
 logger = logging.getLogger("jupyter-webrtc")
-semver_range_frontend = "~" + ipywebrtc._version.__version_js__
+# "0.6.0" = "~" + ipywebrtc._version.__version_js__
 
 
 @register
@@ -40,8 +40,8 @@ class MediaStream(DOMWidget):
     _view_module = Unicode('jupyter-webrtc').tag(sync=True)
     _view_name = Unicode('MediaStreamView').tag(sync=True)
     _model_name = Unicode('MediaStreamModel').tag(sync=True)
-    _view_module_version = Unicode(semver_range_frontend).tag(sync=True)
-    _model_module_version = Unicode(semver_range_frontend).tag(sync=True)
+    _view_module_version = Unicode("0.6.0").tag(sync=True)
+    _model_module_version = Unicode("0.6.0").tag(sync=True)
 
 
 # for backwards compatibility with ipyvolume
@@ -316,8 +316,8 @@ class CameraStream(MediaStream):
 class Recorder(DOMWidget):
     _model_module = Unicode('jupyter-webrtc').tag(sync=True)
     _view_module = Unicode('jupyter-webrtc').tag(sync=True)
-    _view_module_version = Unicode(semver_range_frontend).tag(sync=True)
-    _model_module_version = Unicode(semver_range_frontend).tag(sync=True)
+    _view_module_version = Unicode("0.6.0").tag(sync=True)
+    _model_module_version = Unicode("0.6.0").tag(sync=True)
 
     stream = Instance(
         MediaStream, allow_none=True, help="An instance of :class:`MediaStream` that is the source for recording."
@@ -520,8 +520,8 @@ class WebRTCPeer(DOMWidget):
     _view_module = Unicode('jupyter-webrtc').tag(sync=True)
     _view_name = Unicode('WebRTCPeerView').tag(sync=True)
     _model_name = Unicode('WebRTCPeerModel').tag(sync=True)
-    _view_module_version = Unicode(semver_range_frontend).tag(sync=True)
-    _model_module_version = Unicode(semver_range_frontend).tag(sync=True)
+    _view_module_version = Unicode("0.6.0").tag(sync=True)
+    _model_module_version = Unicode("0.6.0").tag(sync=True)
 
     stream_local = Instance(MediaStream, allow_none=True).tag(sync=True, **widget_serialization)
     stream_remote = Instance(MediaStream, allow_none=True).tag(sync=True, **widget_serialization)
@@ -541,8 +541,8 @@ class WebRTCRoom(DOMWidget):
     _model_module = Unicode('jupyter-webrtc').tag(sync=True)
     _view_module = Unicode('jupyter-webrtc').tag(sync=True)
     _model_name = Unicode('WebRTCRoomModel').tag(sync=True)
-    _view_module_version = Unicode(semver_range_frontend).tag(sync=True)
-    _model_module_version = Unicode(semver_range_frontend).tag(sync=True)
+    _view_module_version = Unicode("0.6.0").tag(sync=True)
+    _model_module_version = Unicode("0.6.0").tag(sync=True)
 
     room = Unicode('room').tag(sync=True)
     stream = Instance(MediaStream, allow_none=True).tag(sync=True, **widget_serialization)
@@ -574,3 +574,58 @@ for name, cls in list(vars().items()):
                     trait.__doc__ = trait.metadata['help']
     except TypeError:
         pass
+
+@register
+class ArjsStream(DOMWidget):
+    """Represent a stream of an arjs element"""
+    _model_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _view_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _model_name = Unicode('ArjsStreamModel').tag(sync=True)
+    _view_name = Unicode('ArjsStreamView').tag(sync=True)
+    _view_module_version = Unicode("0.6.0").tag(sync=True)
+    _model_module_version = Unicode("0.6.0").tag(sync=True)
+
+    
+@register 
+class Camera(DOMWidget):
+    _model_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _view_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _model_name = Unicode('CameraModel').tag(sync=True)
+    _view_name = Unicode('CameraView').tag(sync=True)
+    _view_module_version = Unicode("0.6.0").tag(sync=True)
+    _model_module_version = Unicode("0.6.0").tag(sync=True)
+
+    pass
+
+class AssetManager(DOMWidget):
+    _model_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _view_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _model_name = Unicode('AssetManagerModel').tag(sync=True)
+    _view_name = Unicode('AssetManagerView').tag(sync=True)
+    _view_module_version = Unicode("0.6.0").tag(sync=True)
+    _model_module_version = Unicode("0.6.0").tag(sync=True)
+
+
+class Assets(DOMWidget):
+    _model_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _view_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _model_name = Unicode('AssetsModel').tag(sync=True)
+    _view_name = Unicode('AssetsView').tag(sync=True)
+    _view_module_version = Unicode("0.6.0").tag(sync=True)
+    _model_module_version = Unicode("0.6.0").tag(sync=True)
+
+    asset_list = Dict({'id': "id", 'src': 'src'}).tag(sync=True)
+
+    pass
+
+@register
+class Scene(DOMWidget):
+    _model_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _view_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _model_name = Unicode('SceneModel').tag(sync=True)
+    _view_name = Unicode('SceneView').tag(sync=True)
+    _view_module_version = Unicode("0.6.0").tag(sync=True)
+    _model_module_version = Unicode("0.6.0").tag(sync=True)
+
+    camera = Instance(Camera).tag(sync=True, **widget_serialization)
+    asset_manager = Instance(AssetManager).tag(sync=True, **widget_serialization)
