@@ -597,6 +597,20 @@ class Camera(DOMWidget):
 
     pass
 
+@register
+class Asset(DOMWidget):
+    _model_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _view_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _model_name = Unicode('AssetModel').tag(sync=True)
+    _view_name = Unicode('AssetView').tag(sync=True)
+    _view_module_version = Unicode("0.6.0").tag(sync=True)
+    _model_module_version = Unicode("0.6.0").tag(sync=True)
+
+    id = Unicode().tag(sync=True)
+    src = Unicode().tag(sync=True)
+
+    pass
+@register
 class AssetManager(DOMWidget):
     _model_module = Unicode('jupyter-webrtc').tag(sync=True)
     _view_module = Unicode('jupyter-webrtc').tag(sync=True)
@@ -605,18 +619,7 @@ class AssetManager(DOMWidget):
     _view_module_version = Unicode("0.6.0").tag(sync=True)
     _model_module_version = Unicode("0.6.0").tag(sync=True)
 
-
-class Assets(DOMWidget):
-    _model_module = Unicode('jupyter-webrtc').tag(sync=True)
-    _view_module = Unicode('jupyter-webrtc').tag(sync=True)
-    _model_name = Unicode('AssetsModel').tag(sync=True)
-    _view_name = Unicode('AssetsView').tag(sync=True)
-    _view_module_version = Unicode("0.6.0").tag(sync=True)
-    _model_module_version = Unicode("0.6.0").tag(sync=True)
-
-    asset_list = Dict({'id': "id", 'src': 'src'}).tag(sync=True)
-
-    pass
+    assets = Instance(Asset).tag(sync=True, **widget_serialization)
 
 @register
 class Scene(DOMWidget):
