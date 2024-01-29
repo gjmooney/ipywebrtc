@@ -622,6 +622,42 @@ class AssetManager(DOMWidget):
     assets = Instance(Asset).tag(sync=True, **widget_serialization)
 
 @register
+class Entity(DOMWidget):
+    _model_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _view_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _model_name = Unicode('EntityModel').tag(sync=True)
+    _view_name = Unicode('EntityView').tag(sync=True)
+    _view_module_version = Unicode("0.6.0").tag(sync=True)
+    _model_module_version = Unicode("0.6.0").tag(sync=True)
+
+    id = Unicode().tag(sync=True)
+    gltf_model = Unicode().tag(sync=True)
+    positionn = Unicode().tag(sync=True)
+    scale = Unicode().tag(sync=True)
+    class_name = Unicode().tag(sync=True)
+    # TODO: accept custom components
+
+    pass
+
+@register
+class Marker(DOMWidget):
+    _model_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _view_module = Unicode('jupyter-webrtc').tag(sync=True)
+    _model_name = Unicode('MarkerModel').tag(sync=True)
+    _view_name = Unicode('MarkerView').tag(sync=True)
+    _view_module_version = Unicode("0.6.0").tag(sync=True)
+    _model_module_version = Unicode("0.6.0").tag(sync=True)
+
+    preset = Unicode().tag(sync=True)
+    raycaster = Unicode().tag(sync=True)
+    emitevents = Unicode().tag(sync=True)
+    cursor = Unicode().tag(sync=True)
+    id = Unicode().tag(sync=True)
+
+    entity = Instance(Entity).tag(sync=True, **widget_serialization)
+
+    pass
+@register
 class Scene(DOMWidget):
     _model_module = Unicode('jupyter-webrtc').tag(sync=True)
     _view_module = Unicode('jupyter-webrtc').tag(sync=True)
@@ -632,3 +668,4 @@ class Scene(DOMWidget):
 
     camera = Instance(Camera).tag(sync=True, **widget_serialization)
     asset_manager = Instance(AssetManager).tag(sync=True, **widget_serialization)
+    marker = Instance(Marker).tag(sync=True, **widget_serialization)
