@@ -356,7 +356,6 @@ AFRAME.registerComponent("gesture-handler", {
 
   init: function () {
     this.handleScale = this.handleScale.bind(this);
-    this.handleRotation = this.handleRotation.bind(this);
 
     this.mouseUp = this.mouseUp.bind(this);
     this.mouseDown = this.mouseDown.bind(this);
