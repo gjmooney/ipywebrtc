@@ -67,6 +67,7 @@
     "webpack-cli": "^4.5.0"
   },
   "dependencies": {
+    "@ar-js-org/ar.js": "^3.4.5",
     "@jupyter-widgets/base": "*",
     "aframe": "^1.5.0",
     "buffer": "^4.9.2",
