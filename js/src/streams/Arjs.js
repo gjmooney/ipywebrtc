@@ -4,7 +4,7 @@ import {
   unpack_models,
 } from "@jupyter-widgets/base";
 require("aframe");
-require("   @ar-js-org/ar.js/three.js/build/ar.js");
+require("@ar-js-org/ar.js/three.js/build/ar.js");
 
 const semver_range = "~" + require("../../package.json").version;
 
