@@ -3,6 +3,9 @@ import {
   DOMWidgetView,
   unpack_models,
 } from "@jupyter-widgets/base";
+
+import "../../css/webrtc.css";
+
 require("aframe");
 require("@ar-js-org/ar.js/three.js/build/ar.js");
 
@@ -98,6 +101,7 @@ export class SceneView extends DOMWidgetView {
     this.el.classList.add("a-scene-holder");
     window.last_media_stream_view = this;
     this.video = document.createElement("video");
+    this.video.classList.add("jl-vid");
     this.video.controls = true;
 
     this.initPromise = this.model.captureStream();
@@ -108,8 +112,8 @@ export class SceneView extends DOMWidgetView {
         this.video.srcObject = stream;
         this.video.style.position = "absolute";
         this.video.style.display = "block";
-        // this.el.appendChild(this.video);
-        this.el.parentNode.insertBefore(this.video, this.el.nextSibling);
+        this.el.appendChild(this.video);
+        // this.el.parentNode.insertBefore(this.video, this.el.nextSibling);
         this.video.play();
       },
       (error) => {
