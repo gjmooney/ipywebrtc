@@ -31,7 +31,7 @@ export class SceneModel extends DOMWidgetModel {
       this.cameraStream = navigator.mediaDevices.getUserMedia(
         // this.get("constraints")
         // TODO: don't hardcode these
-        { audio: false, video: { width: 1280, height: 500 } }
+        { audio: false, video: { width: 640, height: 480 } }
       );
     }
     return this.cameraStream;
@@ -65,6 +65,7 @@ export class SceneView extends DOMWidgetView {
     this.el.setAttribute("renderer", "logarithmicDepthBuffer: true");
     this.el.setAttribute("vr-mode-ui", "enabled: false");
     this.el.setAttribute("id", "scene");
+    // this.el.style.minHeight = "480px";
   }
 
   async createCamera() {
@@ -91,15 +92,10 @@ export class SceneView extends DOMWidgetView {
     super.render();
 
     // this.el.setAttribute("height", "480px");
-    this.on(
-      "arjs-video-loaded",
-      (e) => {
-        this.el.style.width = "640px";
-        this.el.style.height = "480px";
-      },
-      this
-    );
 
+    // this.el.setAttribute("style", "min-height: 480px");
+
+    this.el.classList.add("a-scene-holder");
     window.last_media_stream_view = this;
     this.video = document.createElement("video");
     this.video.controls = true;
@@ -109,11 +105,11 @@ export class SceneView extends DOMWidgetView {
     this.initPromise.then(
       (stream) => {
         // TODO: Get video element in the right spot in DOM
-        // this.el.parentNode.insertBefore(this.video, this.el.nextSibling);
         this.video.srcObject = stream;
         this.video.style.position = "absolute";
         this.video.style.display = "block";
-        this.el.appendChild(this.video);
+        // this.el.appendChild(this.video);
+        this.el.parentNode.insertBefore(this.video, this.el.nextSibling);
         this.video.play();
       },
       (error) => {
