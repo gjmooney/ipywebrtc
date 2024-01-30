@@ -126,6 +126,10 @@ export class SceneView extends DOMWidgetView {
   }
 }
 
+window.addEventListener("arjs-video-loaded", (e) => {
+  document.body.removeChild(e.detail.component);
+});
+
 export class AssetManagerModel extends DOMWidgetModel {
   defaults() {
     return {
