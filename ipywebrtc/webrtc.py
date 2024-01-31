@@ -632,7 +632,7 @@ class Entity(DOMWidget):
 
     id = Unicode().tag(sync=True)
     gltf_model = Unicode().tag(sync=True)
-    positionn = Unicode().tag(sync=True)
+    position = Unicode().tag(sync=True)
     scale = Unicode().tag(sync=True)
     class_name = Unicode().tag(sync=True)
     # TODO: accept custom components
