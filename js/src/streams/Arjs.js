@@ -114,6 +114,7 @@ export class SceneView extends DOMWidgetView {
         // this.video.style.display = "block";
         // this.el.appendChild(this.video);
         // TODO: parent node is undefined sometimes?
+        this.video.setAttribute("id", "arjs-video");
         this.el.parentNode.insertBefore(this.video, this.el.nextSibling);
         this.video.play();
       },
@@ -247,6 +248,12 @@ export class MarkerView extends DOMWidgetView {
     super.initialize(options);
 
     this.createEntity();
+    this.el.setAttribute("preset", this.model.get("preset"));
+    this.el.setAttribute("raycaster", this.model.get("raycaster"));
+    this.el.setAttribute("emitevents", this.model.get("emitevents"));
+    this.el.setAttribute("cursor", this.model.get("cursor"));
+    this.el.setAttribute("visible", "");
+    this.el.setAttribute("id", this.model.get("id"));
   }
 
   async createEntity() {
@@ -256,13 +263,8 @@ export class MarkerView extends DOMWidgetView {
 
   render() {
     console.log("this.el.object3D - marker", this.el.object3D);
-    this.el.classList.remove("lm-Widget");
-    this.el.setAttribute("preset", this.model.get("preset"));
-    this.el.setAttribute("raycaster", this.model.get("raycaster"));
-    this.el.setAttribute("emitevents", this.model.get("emitevents"));
-    this.el.setAttribute("cursor", this.model.get("cursor"));
-    this.el.setAttribute("visible", "");
-    this.el.setAttribute("id", this.model.get("id"));
+    // this.el.classList.remove("lm-Widget");
+
     super.render();
   }
 }
@@ -310,9 +312,9 @@ export class EntityView extends DOMWidgetView {
 
     this.el.setAttribute("id", this.model.get("id"));
     this.el.setAttribute("gltf-model", this.model.get("gltf_model"));
-    this.el.setAttribute("position", this.model.get("position"));
+    this.el.setAttribute("position", "0 0 0");
     // this.el.object3D.position = "0 0 0";
-    this.el.setAttribute("scale", this.model.get("scale"));
+    this.el.setAttribute("scale", "0.5 0.5 0.5");
     this.el.setAttribute("class", this.model.get("class_name"));
     this.el.setAttribute("gesture-handler", "");
   }
