@@ -231,11 +231,11 @@ export class MarkerModel extends DOMWidgetModel {
 
 MarkerModel.serializers = {
   ...DOMWidgetModel.serializers,
-  preset: { deserialize: unpack_models },
-  raycaster: { deserialize: unpack_models },
-  emitevents: { deserialize: unpack_models },
-  cursor: { deserialize: unpack_models },
-  id: { deserialize: unpack_models },
+  // preset: { deserialize: unpack_models },
+  // raycaster: { deserialize: unpack_models },
+  // emitevents: { deserialize: unpack_models },
+  // cursor: { deserialize: unpack_models },
+  // id: { deserialize: unpack_models },
   entity: { deserialize: unpack_models },
 };
 
@@ -289,14 +289,14 @@ export class EntityModel extends DOMWidgetModel {
   }
 }
 
-EntityModel.serializers = {
-  ...DOMWidgetModel.serializers,
-  id: { deserialize: unpack_models },
-  gltf_model: { deserialize: unpack_models },
-  position: { deserialize: unpack_models },
-  scale: { deserialize: unpack_models },
-  class_name: { deserialize: unpack_models },
-};
+// EntityModel.serializers = {
+//   ...DOMWidgetModel.serializers,
+//   id: { deserialize: unpack_models },
+//   gltf_model: { deserialize: unpack_models },
+//   position: { deserialize: unpack_models },
+//   scale: { deserialize: unpack_models },
+//   class_name: { deserialize: unpack_models },
+// };
 
 export class EntityView extends DOMWidgetView {
   get tagName() {
@@ -312,9 +312,9 @@ export class EntityView extends DOMWidgetView {
 
     this.el.setAttribute("id", this.model.get("id"));
     this.el.setAttribute("gltf-model", this.model.get("gltf_model"));
-    this.el.setAttribute("position", "0 0 0");
+    this.el.setAttribute("position", this.model.get("position"));
     // this.el.object3D.position = "0 0 0";
-    this.el.setAttribute("scale", "0.5 0.5 0.5");
+    this.el.setAttribute("scale", this.model.get("scale"));
     this.el.setAttribute("class", this.model.get("class_name"));
     this.el.setAttribute("gesture-handler", "");
   }
@@ -445,7 +445,7 @@ AFRAME.registerComponent("gesture-handler", {
 
   handleScale: function (event) {
     console.log("event", event.wheelDeltaY);
-    if (this.isVisible) {
+    if (this.isVisible && event.shiftKey) {
       this.scaleFactor -=
         event.deltaY * (2 / (window.innerWidth + window.innerHeight));
 
