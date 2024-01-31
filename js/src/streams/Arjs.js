@@ -7,7 +7,7 @@ import {
 import "../../css/webrtc.css";
 
 require("aframe");
-require("@ar-js-org/ar.js/three.js/build/ar.js");
+require("@ar-js-org/ar.js");
 
 const semver_range = "~" + require("../../package.json").version;
 
@@ -110,10 +110,11 @@ export class SceneView extends DOMWidgetView {
       (stream) => {
         // TODO: Get video element in the right spot in DOM
         this.video.srcObject = stream;
-        this.video.style.position = "absolute";
-        this.video.style.display = "block";
-        this.el.appendChild(this.video);
-        // this.el.parentNode.insertBefore(this.video, this.el.nextSibling);
+        // this.video.style.position = "absolute";
+        // this.video.style.display = "block";
+        // this.el.appendChild(this.video);
+        // TODO: parent node is undefined sometimes?
+        this.el.parentNode.insertBefore(this.video, this.el.nextSibling);
         this.video.play();
       },
       (error) => {
@@ -254,12 +255,15 @@ export class MarkerView extends DOMWidgetView {
   }
 
   render() {
-    super.render();
+    console.log("this.el.object3D - marker", this.el.object3D);
+    this.el.classList.remove("lm-Widget");
     this.el.setAttribute("preset", this.model.get("preset"));
     this.el.setAttribute("raycaster", this.model.get("raycaster"));
     this.el.setAttribute("emitevents", this.model.get("emitevents"));
     this.el.setAttribute("cursor", this.model.get("cursor"));
+    this.el.setAttribute("visible", "");
     this.el.setAttribute("id", this.model.get("id"));
+    super.render();
   }
 }
 
@@ -297,18 +301,28 @@ export class EntityView extends DOMWidgetView {
     return "a-entity";
   }
 
-  render() {
+  initialize(options) {
+    super.initialize(options);
+
     console.log('this.model.get("gltf_model")', this.model.get("gltf_model"));
     console.log('this.model.get("position")', this.model.get("position"));
     console.log('this.model.get("scale")', this.model.get("scale"));
 
-    super.render();
     this.el.setAttribute("id", this.model.get("id"));
     this.el.setAttribute("gltf-model", this.model.get("gltf_model"));
     this.el.setAttribute("position", this.model.get("position"));
+    // this.el.object3D.position = "0 0 0";
     this.el.setAttribute("scale", this.model.get("scale"));
     this.el.setAttribute("class", this.model.get("class_name"));
     this.el.setAttribute("gesture-handler", "");
+  }
+
+  render() {
+    console.log("this.el.object3D mesh", this.el.object3DMap);
+    console.log("this.el.object3DMap", this.el.getObject3D("mesh"));
+    console.log('this.el.getAttribute("scale")', this.el.getAttribute("scale"));
+
+    super.render();
   }
 }
 
