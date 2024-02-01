@@ -63,7 +63,10 @@ export class SceneView extends DOMWidgetView {
     // create camera
     this.createCamera();
 
-    this.el.setAttribute("arjs", "sourceType: webcam; debugUIEnabled: false");
+    this.el.setAttribute(
+      "arjs",
+      "sourceType: webcam; debugUIEnabled: false; displayWidth: 640px; displayHeight: 480px"
+    );
     this.el.setAttribute("embedded", "");
     this.el.setAttribute("renderer", "logarithmicDepthBuffer: true");
     this.el.setAttribute("vr-mode-ui", "enabled: false");
@@ -115,6 +118,10 @@ export class SceneView extends DOMWidgetView {
         // this.el.appendChild(this.video);
         // TODO: parent node is undefined sometimes?
         this.video.setAttribute("id", "arjs-video");
+        this.video.setAttribute("autoplay", "");
+        this.video.setAttribute("muted", "");
+        this.video.setAttribute("playsinline", "");
+
         this.el.parentNode.insertBefore(this.video, this.el.nextSibling);
         this.video.play();
       },
@@ -129,7 +136,10 @@ export class SceneView extends DOMWidgetView {
 }
 
 window.addEventListener("arjs-video-loaded", (e) => {
-  document.body.removeChild(e.detail.component);
+  // Hide video feed form ar.js that shows up behind output cells
+  document
+    .querySelectorAll("#arjs-video")[1]
+    .setAttribute("style", "display: none");
 });
 
 export class AssetManagerModel extends DOMWidgetModel {
@@ -171,7 +181,6 @@ export class AssetManagerView extends DOMWidgetView {
 
   render() {
     super.render();
-    console.log(`this.model.get('assets')`, this.model.get("assets"));
   }
 }
 
@@ -248,6 +257,8 @@ export class MarkerView extends DOMWidgetView {
     super.initialize(options);
 
     this.createEntity();
+    this.el.classList.remove("lm-Widget");
+
     this.el.setAttribute("preset", this.model.get("preset"));
     this.el.setAttribute("raycaster", this.model.get("raycaster"));
     this.el.setAttribute("emitevents", this.model.get("emitevents"));
@@ -262,9 +273,6 @@ export class MarkerView extends DOMWidgetView {
   }
 
   render() {
-    console.log("this.el.object3D - marker", this.el.object3D);
-    // this.el.classList.remove("lm-Widget");
-
     super.render();
   }
 }
@@ -306,14 +314,11 @@ export class EntityView extends DOMWidgetView {
   initialize(options) {
     super.initialize(options);
 
-    console.log('this.model.get("gltf_model")', this.model.get("gltf_model"));
-    console.log('this.model.get("position")', this.model.get("position"));
-    console.log('this.model.get("scale")', this.model.get("scale"));
+    this.el.classList.remove("lm-Widget");
 
     this.el.setAttribute("id", this.model.get("id"));
     this.el.setAttribute("gltf-model", this.model.get("gltf_model"));
     this.el.setAttribute("position", this.model.get("position"));
-    // this.el.object3D.position = "0 0 0";
     this.el.setAttribute("scale", this.model.get("scale"));
     this.el.setAttribute("class", this.model.get("class_name"));
     this.el.setAttribute("gesture-handler", "");
