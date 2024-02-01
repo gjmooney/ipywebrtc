@@ -34,7 +34,7 @@ export class SceneModel extends DOMWidgetModel {
       this.cameraStream = navigator.mediaDevices.getUserMedia(
         // this.get("constraints")
         // TODO: don't hardcode these
-        { audio: false, video: { width: 640, height: 480 } }
+        { audio: false, video: { width: 1280, height: 720 } }
       );
     }
     return this.cameraStream;
@@ -65,7 +65,7 @@ export class SceneView extends DOMWidgetView {
 
     this.el.setAttribute(
       "arjs",
-      "sourceType: webcam; debugUIEnabled: false; displayWidth: 640px; displayHeight: 480px"
+      "sourceType: webcam; debugUIEnabled: true; displayWidth: 1280px; displayHeight: 720px"
     );
     this.el.setAttribute("embedded", "");
     this.el.setAttribute("renderer", "logarithmicDepthBuffer: true");
@@ -102,6 +102,7 @@ export class SceneView extends DOMWidgetView {
     // this.el.setAttribute("style", "min-height: 480px");
 
     this.el.classList.add("a-scene-holder");
+    this.el.classList.remove("lm-Widget");
     window.last_media_stream_view = this;
     this.video = document.createElement("video");
     this.video.classList.add("jl-vid");
@@ -355,13 +356,15 @@ CameraModel.serializers = {
 
 export class CameraView extends DOMWidgetView {
   get tagName() {
-    return "a-camera";
+    return "a-entity";
   }
 
   render() {
     super.render();
-    this.el.setAttribute("wasd-controls", "");
-    this.el.setAttribute("look-controls", "enabled: false");
+    this.el.classList.remove("lm-Widget");
+    this.el.setAttribute("camera", "");
+    // this.el.setAttribute("wasd-controls", "");
+    // this.el.setAttribute("look-controls", "enabled: false");
     // this.el.classList.remove("a-grab-cursor");
   }
 }
