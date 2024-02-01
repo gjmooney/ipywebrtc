@@ -56,36 +56,26 @@ export class SceneView extends DOMWidgetView {
   initialize(options) {
     super.initialize(options);
 
-    // create asset manager
     this.createAssetManager();
-    // create marker
     this.createMarker();
-    // create camera
     this.createCamera();
 
-    this.el.setAttribute(
-      "arjs",
-      "sourceType: webcam; debugUIEnabled: true; displayWidth: 1280px; displayHeight: 720px"
-    );
+    this.el.setAttribute("arjs", "sourceType: webcam; debugUIEnabled: false;");
     this.el.setAttribute("embedded", "");
     this.el.setAttribute("renderer", "logarithmicDepthBuffer: true");
     this.el.setAttribute("vr-mode-ui", "enabled: false");
     this.el.setAttribute("id", "scene");
-    // this.el.style.minHeight = "480px";
   }
 
   async createCamera() {
     const camera = await this.create_child_view(this.model.get("camera"));
-    // TODO: these should ultimately be passed from the python side
     this.el.appendChild(camera.el);
   }
 
   async createAssetManager() {
-    // TODO: pass {id, src} from python
     const asset_manager = await this.create_child_view(
       this.model.get("asset_manager")
     );
-
     this.el.appendChild(asset_manager.el);
   }
 
@@ -97,12 +87,9 @@ export class SceneView extends DOMWidgetView {
   render() {
     super.render();
 
-    // this.el.setAttribute("height", "480px");
-
-    // this.el.setAttribute("style", "min-height: 480px");
-
-    this.el.classList.add("a-scene-holder");
     this.el.classList.remove("lm-Widget");
+    this.el.classList.add("a-scene-holder");
+
     window.last_media_stream_view = this;
     this.video = document.createElement("video");
     this.video.classList.add("jl-vid");
@@ -112,13 +99,8 @@ export class SceneView extends DOMWidgetView {
 
     this.initPromise.then(
       (stream) => {
-        // TODO: Get video element in the right spot in DOM
         this.video.srcObject = stream;
-        // this.video.style.position = "absolute";
-        // this.video.style.display = "block";
-        // this.el.appendChild(this.video);
-        // TODO: parent node is undefined sometimes?
-        this.video.setAttribute("id", "arjs-video");
+        // this.video.setAttribute("id", "arjs-video");
         this.video.setAttribute("autoplay", "");
         this.video.setAttribute("muted", "");
         this.video.setAttribute("playsinline", "");
@@ -137,10 +119,8 @@ export class SceneView extends DOMWidgetView {
 }
 
 window.addEventListener("arjs-video-loaded", (e) => {
-  // Hide video feed form ar.js that shows up behind output cells
-  document
-    .querySelectorAll("#arjs-video")[1]
-    .setAttribute("style", "display: none");
+  // Hide video feed from ar.js that shows up behind output cells
+  document.querySelector("#arjs-video").setAttribute("style", "display: none");
 });
 
 export class AssetManagerModel extends DOMWidgetModel {
@@ -171,7 +151,6 @@ export class AssetManagerView extends DOMWidgetView {
   initialize(options) {
     super.initialize(options);
 
-    // create assets
     this.createAssets();
   }
 
@@ -241,11 +220,6 @@ export class MarkerModel extends DOMWidgetModel {
 
 MarkerModel.serializers = {
   ...DOMWidgetModel.serializers,
-  // preset: { deserialize: unpack_models },
-  // raycaster: { deserialize: unpack_models },
-  // emitevents: { deserialize: unpack_models },
-  // cursor: { deserialize: unpack_models },
-  // id: { deserialize: unpack_models },
   entity: { deserialize: unpack_models },
 };
 
@@ -258,6 +232,7 @@ export class MarkerView extends DOMWidgetView {
     super.initialize(options);
 
     this.createEntity();
+
     this.el.classList.remove("lm-Widget");
 
     this.el.setAttribute("preset", this.model.get("preset"));
@@ -298,15 +273,6 @@ export class EntityModel extends DOMWidgetModel {
   }
 }
 
-// EntityModel.serializers = {
-//   ...DOMWidgetModel.serializers,
-//   id: { deserialize: unpack_models },
-//   gltf_model: { deserialize: unpack_models },
-//   position: { deserialize: unpack_models },
-//   scale: { deserialize: unpack_models },
-//   class_name: { deserialize: unpack_models },
-// };
-
 export class EntityView extends DOMWidgetView {
   get tagName() {
     return "a-entity";
@@ -326,10 +292,6 @@ export class EntityView extends DOMWidgetView {
   }
 
   render() {
-    console.log("this.el.object3D mesh", this.el.object3DMap);
-    console.log("this.el.object3DMap", this.el.getObject3D("mesh"));
-    console.log('this.el.getAttribute("scale")', this.el.getAttribute("scale"));
-
     super.render();
   }
 }
@@ -363,9 +325,8 @@ export class CameraView extends DOMWidgetView {
     super.render();
     this.el.classList.remove("lm-Widget");
     this.el.setAttribute("camera", "");
+    // TODO: Can these work with Jupyter keyboard controls?
     // this.el.setAttribute("wasd-controls", "");
-    // this.el.setAttribute("look-controls", "enabled: false");
-    // this.el.classList.remove("a-grab-cursor");
   }
 }
 
