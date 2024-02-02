@@ -2,6 +2,7 @@ export * from "./streams/Arjs";
 export * from "./streams/Audio";
 export * from "./streams/Camera";
 export * from "./streams/Image";
+export * from "./streams/MagicCube";
 export * from "./streams/Media";
 export * from "./streams/Recorder";
 export * from "./streams/Video";
