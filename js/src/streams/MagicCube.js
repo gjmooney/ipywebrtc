@@ -2,6 +2,13 @@ import * as THREEx from "@ar-js-org/ar.js/three.js/build/ar-threex.js";
 import { DOMWidgetModel, DOMWidgetView } from "@jupyter-widgets/base";
 import * as THREE from "three";
 
+import xneg from "../../../images/xneg.png";
+import xpos from "../../../images/xpos.png";
+import yneg from "../../../images/yneg.png";
+import ypos from "../../../images/ypos.png";
+import zneg from "../../../images/zneg.png";
+import zpos from "../../../images/zpos.png";
+
 const semver_range = "~" + require("../../package.json").version;
 
 export class MagicCubeModel extends DOMWidgetModel {
@@ -41,6 +48,9 @@ export class MagicCubeView extends DOMWidgetView {
     console.log("start marker roots");
     this.setupMarkerRoots();
 
+    console.log("start scene");
+    this.setupScene();
+
     console.log("this.scene", this.scene);
   }
 
@@ -71,10 +81,10 @@ export class MagicCubeView extends DOMWidgetView {
     this.el.appendChild(this.renderer.domElement);
 
     // PLAYING WITH CUBE
-    this.geometry = new THREE.BoxGeometry(1, 1, 1);
-    this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    this.cube = new THREE.Mesh(this.geometry, this.material);
-    this.scene.add(this.cube);
+    // this.geometry = new THREE.BoxGeometry(1, 1, 1);
+    // this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    // this.cube = new THREE.Mesh(this.geometry, this.material);
+    // this.scene.add(this.cube);
 
     this.camera.position.z = 5;
   }
@@ -140,18 +150,13 @@ export class MagicCubeView extends DOMWidgetView {
       new THREE.Vector3(0, 0, 0),
     ];
 
-    console.log("marker root 1");
-    console.log("rotationArray", this.rotationArray);
-    console.log("this.patternArray", this.patternArray);
-
-    for (this.i = 0; this.i < 6; this.i++) {
-      console.log("marker root 2");
+    for (let i = 0; i < 6; i++) {
       this.markerRoot = new THREE.Group();
 
       this.markerRootArray.push(this.markerRoot);
-      console.log("marker root 3");
+
       this.scene.add(this.markerRoot);
-      console.log("marker root 4");
+
       this.markerControls = new THREEx.ArMarkerControls(
         this.arToolkitContext,
         this.markerRoot,
@@ -160,66 +165,74 @@ export class MagicCubeView extends DOMWidgetView {
           patternUrl:
             THREEx.ArToolkitContext.baseURL +
             "examples/marker-training/examples/pattern-files/pattern-" +
-            this.patternArray[this.i] +
+            this.patternArray[i] +
             ".patt",
-          // new URL("../../data/" + this.patternArray[this.i] + ".patt",import.meta.url),
+          // new URL("../../data/" + this.patternArray[i] + ".patt",import.meta.url),
         }
       );
 
       //THREEx.ArToolkitContext.baseURL
 
-      console.log("marker root 5");
-
       this.markerGroup = new THREE.Group();
       this.markerGroupArray.push(this.markerGroup);
-      console.log("marker root 6");
+
       this.markerGroup.position.y = -1.25 / 2;
-      this.markerGroup.rotation.setFromVector3(this.rotationArray[this.i]);
-      console.log("marker root 7");
+      this.markerGroup.rotation.setFromVector3(this.rotationArray[i]);
 
       this.markerRoot.add(this.markerGroup);
-      console.log("marker root 8");
     }
 
-    console.log("markerRootArray", markerRootArray);
+    console.log("markerRootArray", this.markerRootArray);
   }
 
-  // setupScene() {
-  //   this.sceneGroup = new THREE.Group();
+  setupScene() {
+    this.sceneGroup = new THREE.Group();
+    console.log("scene 1");
 
-  //   // a 1x1x1 cube model with scale factor 1.25 fills up the physical cube
-  //   this.sceneGroup.scale.set(1.25 / 2, 1.25 / 2, 1.25 / 2);
+    // a 1x1x1 cube model with scale factor 1.25 fills up the physical cube
+    this.sceneGroup.scale.set(1.25 / 2, 1.25 / 2, 1.25 / 2);
 
-  //   this.loader = new THREE.TextureLoader();
+    console.log("scene 2");
 
-  //   // a simple cube
-  //   this.materialArray = [
-  //     new THREE.MeshBasicMaterial({
-  //       map: this.loader.load("../../images/xpos.png"),
-  //     }),
-  //     new THREE.MeshBasicMaterial({
-  //       map: this.loader.load("../../images/xneg.png"),
-  //     }),
-  //     new THREE.MeshBasicMaterial({
-  //       map: this.loader.load("../../images/ypos.png"),
-  //     }),
-  //     new THREE.MeshBasicMaterial({
-  //       map: this.loader.load("../../images/yneg.png"),
-  //     }),
-  //     new THREE.MeshBasicMaterial({
-  //       map: this.loader.load("../../images/zpos.png"),
-  //     }),
-  //     new THREE.MeshBasicMaterial({
-  //       map: this.loader.load("../../images/zneg.png"),
-  //     }),
-  //   ];
+    this.loader = new THREE.TextureLoader();
 
-  //   this.mesh = new THREE.Mesh(
-  //     new THREE.CubeGeometry(1, 1, 1),
-  //     this.materialArray
-  //   );
-  //   this.sceneGroup.add(this.mesh);
-  // }
+    console.log("scene 3");
+    // a simple cube
+    this.materialArray = [
+      new THREE.MeshBasicMaterial({
+        map: this.loader.load(xpos),
+      }),
+      new THREE.MeshBasicMaterial({
+        map: this.loader.load(xneg),
+      }),
+      new THREE.MeshBasicMaterial({
+        map: this.loader.load(ypos),
+      }),
+      new THREE.MeshBasicMaterial({
+        map: this.loader.load(yneg),
+      }),
+      new THREE.MeshBasicMaterial({
+        map: this.loader.load(zpos),
+      }),
+      new THREE.MeshBasicMaterial({
+        map: this.loader.load(zneg),
+      }),
+    ];
+
+    console.log("scene 4");
+
+    console.log("this.materialArray", this.materialArray);
+
+    this.mesh = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 1, 1),
+      this.materialArray
+    );
+
+    console.log("scene 5");
+
+    this.sceneGroup.add(this.mesh);
+    console.log("scene 6");
+  }
 
   onResize() {
     this.arToolkitSource.onResize();
@@ -236,13 +249,11 @@ export class MagicCubeView extends DOMWidgetView {
 
     window.requestAnimationFrame(this.animate.bind(this));
 
-    this.cube.rotation.x += 0.01;
-    this.cube.rotation.y += 0.01;
+    // this.cube.rotation.x += 0.01;
+    // this.cube.rotation.y += 0.01;
 
     this.renderer.render(this.scene, this.camera);
   }
-
-  renderScene() {}
 
   render() {
     console.log("this.animate", this.animate);
@@ -259,3 +270,18 @@ export class MagicCubeView extends DOMWidgetView {
     //animate
   }
 }
+
+window.addEventListener("arjs-video-loaded", (e) => {
+  // Hide video feed from ar.js that shows up behind output cells
+  let el = document.querySelector(".a-scene-holder");
+  el.appendChild(e.detail.component);
+  // document.querySelector("#arjs-video").setAttribute("style", "display: none");
+});
+
+window.addEventListener("markerFound", () => {
+  console.log("Marker found");
+});
+
+window.addEventListener("markerLost", () => {
+  console.log("Marker lost");
+});
