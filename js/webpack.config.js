@@ -11,6 +11,7 @@ const path = require("path");
 var rules = [
   // { test: /\.json$/, use: "json-loader" },
   { test: /\.css$/, use: ["style-loader", "css-loader"] },
+  { test: /\.patt/, type: "asset/resource" },
 ];
 var externals = [
   "@jupyter-widgets/base",
@@ -46,6 +47,9 @@ module.exports = [
       ),
       libraryTarget: "amd",
       publicPath: "",
+    },
+    module: {
+      rules: rules,
     },
     mode: "development",
     resolve: resolve,

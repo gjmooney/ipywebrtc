@@ -1,6 +1,13 @@
 import * as THREEx from "@ar-js-org/ar.js/three.js/build/ar-threex.js";
 import { DOMWidgetModel, DOMWidgetView } from "@jupyter-widgets/base";
 import * as THREE from "three";
+import kanji from "../../data/kanji.patt";
+import letterA from "../../data/letterA.patt";
+import letterB from "../../data/letterB.patt";
+import letterC from "../../data/letterC.patt";
+import letterD from "../../data/letterD.patt";
+import letterF from "../../data/letterF.patt";
+import letterG from "../../data/letterG.patt";
 
 const semver_range = "~" + require("../../package.json").version;
 
@@ -139,7 +146,7 @@ export class MagicCubeView extends DOMWidgetView {
         this.markerRoot,
         {
           type: "pattern",
-          patternUrl: "data/" + this.patternArray[i] + ".patt",
+          patternUrl: this.patternArray[i],
         }
       );
 
