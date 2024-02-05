@@ -37,6 +37,8 @@ export class MagicCubeView extends DOMWidgetView {
 
     this.setupContext();
 
+    this.setupMarkerRoots();
+
     console.log("this.scene", this.scene);
   }
 
@@ -76,48 +78,78 @@ export class MagicCubeView extends DOMWidgetView {
   }
 
   setupSource() {
-    console.log("source 1");
-
     this.arToolkitSource = new THREEx.ArToolkitSource({
       sourceType: "webcam",
     });
-    console.log("source 2");
 
     this.arToolkitSource.init(function onReady() {
       this.onResize();
     });
-    console.log("source 3");
 
     // handle resize event
     window.addEventListener("resize", function () {
       console.log("window listener");
       this.onResize();
     });
-
-    console.log("source 4");
-
-    // console.log("arToolkitSource", arToolkitSource);
   }
 
   setupContext() {
-    console.log("context 1");
-
     this.arToolkitContext = new THREEx.ArToolkitContext({
       cameraParametersUrl:
         THREEx.ArToolkitContext.baseURL + "../data/data/camera_para.dat",
       detectionMode: "mono",
     });
-    console.log("context 2");
 
     // copy projection matrix to camera when initialization complete
-    console.log("context 3");
-
     this.arToolkitContext.init(() => {
       this.camera.projectionMatrix.copy(
         this.arToolkitContext.getProjectionMatrix()
       );
     });
-    console.log("context 4");
+  }
+
+  setupMarkerRoots() {
+    this.markerRootArray = [];
+    this.markerGroupArray = [];
+    this.patternArray = [
+      "letterA",
+      "letterB",
+      "letterC",
+      "letterD",
+      "letterF",
+      "kanji",
+    ];
+
+    this.rotationArray = [
+      new THREE.Vector3(-Math.PI / 2, 0, 0),
+      new THREE.Vector3(0, -Math.PI / 2, Math.PI / 2),
+      new THREE.Vector3(Math.PI / 2, 0, Math.PI),
+      new THREE.Vector3(-Math.PI / 2, Math.PI / 2, 0),
+      new THREE.Vector3(Math.PI, 0, 0),
+      new THREE.Vector3(0, 0, 0),
+    ];
+
+    for (let i = 0; i < 6; i++) {
+      this.markerRoot = new THREE.Group();
+
+      this.markerRootArray.push(this.markerRoot);
+      this.scene.add(this.markerRoot);
+      this.markerControls = new THREEx.ArMarkerControls(
+        this.arToolkitContext,
+        this.markerRoot,
+        {
+          type: "pattern",
+          patternUrl: "data/" + this.patternArray[i] + ".patt",
+        }
+      );
+
+      this.markerGroup = new THREE.Group();
+      this.markerGroupArray.push(this.markerGroup);
+      this.markerGroup.position.y = -1.25 / 2;
+      this.markerGroup.rotation.setFromVector3(this.rotationArray[i]);
+
+      this.markerRoot.add(this.markerGroup);
+    }
   }
 
   onResize() {
