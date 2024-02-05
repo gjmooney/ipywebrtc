@@ -1,13 +1,6 @@
 import * as THREEx from "@ar-js-org/ar.js/three.js/build/ar-threex.js";
 import { DOMWidgetModel, DOMWidgetView } from "@jupyter-widgets/base";
 import * as THREE from "three";
-import kanji from "../../data/kanji.patt";
-import letterA from "../../data/letterA.patt";
-import letterB from "../../data/letterB.patt";
-import letterC from "../../data/letterC.patt";
-import letterD from "../../data/letterD.patt";
-import letterF from "../../data/letterF.patt";
-import letterG from "../../data/letterG.patt";
 
 const semver_range = "~" + require("../../package.json").version;
 
@@ -30,26 +23,28 @@ MagicCubeModel.serializers = {
 };
 
 export class MagicCubeView extends DOMWidgetView {
+  // base url = https://ar-js-org.github.io/AR.js/three.js/
   initialize() {
     console.log("initial");
 
     this.el.classList.add("a-scene-holder");
 
-    this.setupScene();
-
-    console.log("Scene done");
+    console.log("Start three stuff");
+    this.setupThreeStuff();
 
     console.log("start source");
     this.setupSource();
 
+    console.log("start context");
     this.setupContext();
 
+    console.log("start marker roots");
     this.setupMarkerRoots();
 
     console.log("this.scene", this.scene);
   }
 
-  setupScene() {
+  setupThreeStuff() {
     this.scene = new THREE.Scene();
 
     this.ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
@@ -118,6 +113,15 @@ export class MagicCubeView extends DOMWidgetView {
   setupMarkerRoots() {
     this.markerRootArray = [];
     this.markerGroupArray = [];
+    // this.patternArray = [
+    //   new URL("../../data/letterA.patt", import.meta.url),
+    //   new URL("../../data/letterB.patt", import.meta.url),
+    //   new URL("../../data/letterC.patt", import.meta.url),
+    //   new URL("../../data/letterD.patt", import.meta.url),
+    //   new URL("../../data/letterF.patt", import.meta.url),
+    //   new URL("../../data/kanji.patt", import.meta.url),
+    // ];
+
     this.patternArray = [
       "letterA",
       "letterB",
@@ -136,28 +140,86 @@ export class MagicCubeView extends DOMWidgetView {
       new THREE.Vector3(0, 0, 0),
     ];
 
-    for (let i = 0; i < 6; i++) {
+    console.log("marker root 1");
+    console.log("rotationArray", this.rotationArray);
+    console.log("this.patternArray", this.patternArray);
+
+    for (this.i = 0; this.i < 6; this.i++) {
+      console.log("marker root 2");
       this.markerRoot = new THREE.Group();
 
       this.markerRootArray.push(this.markerRoot);
+      console.log("marker root 3");
       this.scene.add(this.markerRoot);
+      console.log("marker root 4");
       this.markerControls = new THREEx.ArMarkerControls(
         this.arToolkitContext,
         this.markerRoot,
         {
           type: "pattern",
-          patternUrl: this.patternArray[i],
+          patternUrl:
+            THREEx.ArToolkitContext.baseURL +
+            "examples/marker-training/examples/pattern-files/pattern-" +
+            this.patternArray[this.i] +
+            ".patt",
+          // new URL("../../data/" + this.patternArray[this.i] + ".patt",import.meta.url),
         }
       );
 
+      //THREEx.ArToolkitContext.baseURL
+
+      console.log("marker root 5");
+
       this.markerGroup = new THREE.Group();
       this.markerGroupArray.push(this.markerGroup);
+      console.log("marker root 6");
       this.markerGroup.position.y = -1.25 / 2;
-      this.markerGroup.rotation.setFromVector3(this.rotationArray[i]);
+      this.markerGroup.rotation.setFromVector3(this.rotationArray[this.i]);
+      console.log("marker root 7");
 
       this.markerRoot.add(this.markerGroup);
+      console.log("marker root 8");
     }
+
+    console.log("markerRootArray", markerRootArray);
   }
+
+  // setupScene() {
+  //   this.sceneGroup = new THREE.Group();
+
+  //   // a 1x1x1 cube model with scale factor 1.25 fills up the physical cube
+  //   this.sceneGroup.scale.set(1.25 / 2, 1.25 / 2, 1.25 / 2);
+
+  //   this.loader = new THREE.TextureLoader();
+
+  //   // a simple cube
+  //   this.materialArray = [
+  //     new THREE.MeshBasicMaterial({
+  //       map: this.loader.load("../../images/xpos.png"),
+  //     }),
+  //     new THREE.MeshBasicMaterial({
+  //       map: this.loader.load("../../images/xneg.png"),
+  //     }),
+  //     new THREE.MeshBasicMaterial({
+  //       map: this.loader.load("../../images/ypos.png"),
+  //     }),
+  //     new THREE.MeshBasicMaterial({
+  //       map: this.loader.load("../../images/yneg.png"),
+  //     }),
+  //     new THREE.MeshBasicMaterial({
+  //       map: this.loader.load("../../images/zpos.png"),
+  //     }),
+  //     new THREE.MeshBasicMaterial({
+  //       map: this.loader.load("../../images/zneg.png"),
+  //     }),
+  //   ];
+
+  //   this.mesh = new THREE.Mesh(
+  //     new THREE.CubeGeometry(1, 1, 1),
+  //     this.materialArray
+  //   );
+  //   this.sceneGroup.add(this.mesh);
+  // }
 
   onResize() {
     this.arToolkitSource.onResize();
