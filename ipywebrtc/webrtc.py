@@ -774,4 +774,5 @@ class MagicCube(DOMWidget):
     _view_module_version = Unicode("0.6.0").tag(sync=True)
     _model_module_version = Unicode("0.6.0").tag(sync=True)
 
-    pass
+    position = List([0, -1, 0]).tag(sync=True)
+    scale = List([0.085, 0.085, 0.085]).tag(sync=True)

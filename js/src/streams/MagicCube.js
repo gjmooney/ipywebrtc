@@ -17,6 +17,8 @@ export class MagicCubeModel extends DOMWidgetModel {
       _view_name: "MagicCubeView",
       _model_module_version: semver_range,
       _view_module_version: semver_range,
+      scale: [0.085, 0.085, 0.085],
+      position: [0, 0, 0],
     };
   }
 }
@@ -28,6 +30,7 @@ MagicCubeModel.serializers = {
 export class MagicCubeView extends DOMWidgetView {
   // base url = https://ar-js-org.github.io/AR.js/three.js/
   initialize() {
+    console.log('this.model.get("scale")', this.model.get("scale"));
     console.log("initial");
 
     this.el.classList.add("a-scene-holder");
@@ -243,7 +246,7 @@ export class MagicCubeView extends DOMWidgetView {
     // }
 
     // cube edges
-    this.edgeGeometry = new THREE.CylinderGeometry(0.025, 0.025, 2, 32);
+    this.edgeGeometry = new THREE.CylinderGeometry(0.03, 0.03, 2, 32);
 
     this.edgeCenters = [
       new THREE.Vector3(0, -1, -1),
@@ -312,16 +315,17 @@ export class MagicCubeView extends DOMWidgetView {
       "https://cdn.glitch.com/06bd98b4-97ee-4c07-a546-fe39ca205034%2Fbowser.glb",
       (gltf) => {
         console.log("gltf.scene", gltf.scene);
+        this.gltfModel = gltf.scene;
         //TODO: these should be set from python
-        gltf.scene.scale.set(0.085, 0.085, 0.085);
-        gltf.scene.position.set(0, -1, 0);
-        this.sceneGroup.add(gltf.scene);
+        this.gltfModel.scale.fromArray(this.model.get("scale"));
+        this.gltfModel.position.fromArray(this.model.get("position"));
+        this.sceneGroup.add(this.gltfModel);
       },
-      (xhr) => {
+      () => {
         console.log("loading");
       },
       (error) => {
-        console.log("Error loading model");
+        console.log("Error loading model", error);
       }
     );
 
@@ -364,8 +368,19 @@ export class MagicCubeView extends DOMWidgetView {
 
   render() {
     super.render();
+    this.model_events();
     this.animate();
     console.log("scene", "render");
+  }
+
+  model_events() {
+    this.listenTo(this.model, "change:position", () => {
+      this.gltfModel.position.fromArray(this.model.get("position"));
+    });
+
+    this.listenTo(this.model, "change:scale", () => {
+      this.gltfModel.scale.fromArray(this.model.get("scale"));
+    });
   }
 }
 
