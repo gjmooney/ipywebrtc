@@ -86,7 +86,7 @@ export class MagicCubeView extends DOMWidgetView {
     // this.cube = new THREE.Mesh(this.geometry, this.material);
     // this.scene.add(this.cube);
 
-    this.camera.position.z = 5;
+    //this.camera.position.z = 5;
   }
 
   setupSource() {
@@ -187,16 +187,12 @@ export class MagicCubeView extends DOMWidgetView {
 
   setupScene() {
     this.sceneGroup = new THREE.Group();
-    console.log("scene 1");
 
     // a 1x1x1 cube model with scale factor 1.25 fills up the physical cube
     this.sceneGroup.scale.set(1.25 / 2, 1.25 / 2, 1.25 / 2);
 
-    console.log("scene 2");
-
     this.loader = new THREE.TextureLoader();
 
-    console.log("scene 3");
     // a simple cube
     this.materialArray = [
       new THREE.MeshBasicMaterial({
@@ -219,19 +215,12 @@ export class MagicCubeView extends DOMWidgetView {
       }),
     ];
 
-    console.log("scene 4");
-
-    console.log("this.materialArray", this.materialArray);
-
     this.mesh = new THREE.Mesh(
       new THREE.BoxGeometry(1, 1, 1),
       this.materialArray
     );
 
-    console.log("scene 5");
-
     this.sceneGroup.add(this.mesh);
-    console.log("scene 6");
   }
 
   onResize() {
@@ -252,14 +241,25 @@ export class MagicCubeView extends DOMWidgetView {
     // this.cube.rotation.x += 0.01;
     // this.cube.rotation.y += 0.01;
 
+    this.update();
     this.renderer.render(this.scene, this.camera);
   }
 
-  render() {
-    console.log("this.animate", this.animate);
-    console.log("this.scene", this.scene);
-    console.log("this.camera", this.camera);
+  update() {
+    // update artoolkit on every frame
+    if (this.arToolkitSource.ready !== false)
+      this.arToolkitContext.update(this.arToolkitSource.domElement);
 
+    for (let i = 0; i < 6; i++) {
+      if (this.markerRootArray[i].visible) {
+        this.markerGroupArray[i].add(this.sceneGroup);
+        console.log("visible: " + this.patternArray[i]);
+        break;
+      }
+    }
+  }
+
+  render() {
     super.render();
     this.animate();
     // console.log("this.scene", this.scene);
@@ -272,6 +272,7 @@ export class MagicCubeView extends DOMWidgetView {
 }
 
 window.addEventListener("arjs-video-loaded", (e) => {
+  console.log("arjs video loaded");
   // Hide video feed from ar.js that shows up behind output cells
   let el = document.querySelector(".a-scene-holder");
   el.appendChild(e.detail.component);
