@@ -1,6 +1,7 @@
 import * as THREEx from "@ar-js-org/ar.js/three.js/build/ar-threex.js";
 import { DOMWidgetModel, DOMWidgetView } from "@jupyter-widgets/base";
 import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 import tiles from "../../../images/tiles.jpg";
 
@@ -73,6 +74,7 @@ export class MagicCubeView extends DOMWidgetView {
     this.renderer.domElement.style.position = "absolute";
     this.renderer.domElement.style.top = "0px";
     this.renderer.domElement.style.left = "0px";
+    // this.renderer.domElement.classList.add("jl-canvas");
     this.el.appendChild(this.renderer.domElement);
 
     // PLAYING WITH CUBE
@@ -87,6 +89,8 @@ export class MagicCubeView extends DOMWidgetView {
   setupSource() {
     this.arToolkitSource = new THREEx.ArToolkitSource({
       sourceType: "webcam",
+      // sourceWidth: "1280px",
+      // sourceHeight: "720px",
     });
 
     this.arToolkitSource.init(function onReady() {
@@ -188,37 +192,6 @@ export class MagicCubeView extends DOMWidgetView {
 
     this.loader = new THREE.TextureLoader();
 
-    // // a simple cube
-    // this.materialArray = [
-    //   new THREE.MeshBasicMaterial({
-    //     map: this.loader.load(xpos),
-    //   }),
-    //   new THREE.MeshBasicMaterial({
-    //     map: this.loader.load(xneg),
-    //   }),
-    //   new THREE.MeshBasicMaterial({
-    //     map: this.loader.load(ypos),
-    //   }),
-    //   new THREE.MeshBasicMaterial({
-    //     map: this.loader.load(yneg),
-    //   }),
-    //   new THREE.MeshBasicMaterial({
-    //     map: this.loader.load(zpos),
-    //   }),
-    //   new THREE.MeshBasicMaterial({
-    //     map: this.loader.load(zneg),
-    //   }),
-    // ];
-
-    // this.mesh = new THREE.Mesh(
-    //   new THREE.BoxGeometry(1, 1, 1),
-    //   this.materialArray
-    // );
-
-    // this.sceneGroup.add(this.mesh);
-
-    let test = 1;
-
     this.tileTexture = this.loader.load(tiles);
 
     // reversed cube
@@ -233,39 +206,44 @@ export class MagicCubeView extends DOMWidgetView {
     );
 
     // cube vertices
-    this.sphereGeometry = new THREE.SphereGeometry(0.2, 6, 6);
+    // this.sphereGeometry = new THREE.SphereGeometry(0.2, 6, 6);
 
-    this.sphereCenters = [
-      new THREE.Vector3(-1, -1, -1),
-      new THREE.Vector3(-1, -1, 1),
-      new THREE.Vector3(-1, 1, -1),
-      new THREE.Vector3(-1, 1, 1),
-      new THREE.Vector3(1, -1, -1),
-      new THREE.Vector3(1, -1, 1),
-      new THREE.Vector3(1, 1, -1),
-      new THREE.Vector3(1, 1, 1),
-    ];
-    //5
+    // this.sphereCenters = [
+    //   new THREE.Vector3(-1, -1, -1),
+    //   new THREE.Vector3(-1, -1, 1),
+    //   new THREE.Vector3(-1, 1, -1),
+    //   new THREE.Vector3(-1, 1, 1),
+    //   new THREE.Vector3(1, -1, -1),
+    //   new THREE.Vector3(1, -1, 1),
+    //   new THREE.Vector3(1, 1, -1),
+    //   new THREE.Vector3(1, 1, 1),
+    // ];
 
-    this.sphereColors = [
-      0x444444, 0x0000ff, 0x00ff00, 0x00ffff, 0xff0000, 0xff00ff, 0xffff00,
-      0xffffff,
-    ];
+    // this.sphereColors = [
+    //   0x444444,
+    //   0x0000ff,
+    //   0x00ff00,
+    //   0x00ffff,
+    //   0xff0000,
+    //   0xff00ff,
+    //   0xffff00,
+    //   0xffffff,
+    // ];
 
-    for (let i = 0; i < 8; i++) {
-      let sphereMesh = new THREE.Mesh(
-        this.sphereGeometry,
-        new THREE.MeshLambertMaterial({
-          map: this.tileTexture,
-          color: this.sphereColors[i],
-        })
-      );
-      sphereMesh.position.copy(this.sphereCenters[i]);
-      this.sceneGroup.add(sphereMesh);
-    }
+    // for (let i = 0; i < 8; i++) {
+    //   let sphereMesh = new THREE.Mesh(
+    //     this.sphereGeometry,
+    //     new THREE.MeshLambertMaterial({
+    //       map: this.tileTexture,
+    //       color: this.sphereColors[i],
+    //     })
+    //   );
+    //   sphereMesh.position.copy(this.sphereCenters[i]);
+    //   this.sceneGroup.add(sphereMesh);
+    // }
 
     // cube edges
-    this.edgeGeometry = new THREE.CylinderGeometry(0.05, 0.05, 2, 32);
+    this.edgeGeometry = new THREE.CylinderGeometry(0.025, 0.025, 2, 32);
 
     this.edgeCenters = [
       new THREE.Vector3(0, -1, -1),
@@ -298,8 +276,18 @@ export class MagicCubeView extends DOMWidgetView {
     ];
 
     this.edgeColors = [
-      0x880000, 0x880000, 0x880000, 0x880000, 0x008800, 0x008800, 0x008800,
-      0x008800, 0x000088, 0x000088, 0x000088, 0x000088,
+      0x262626,
+      0x262626,
+      0x262626,
+      0x262626,
+      0x262626,
+      0x262626,
+      0x262626,
+      0x262626,
+      0x262626,
+      0x262626,
+      0x262626,
+      0x262626,
     ];
 
     for (let i = 0; i < 12; i++) {
@@ -317,12 +305,24 @@ export class MagicCubeView extends DOMWidgetView {
       this.sceneGroup.add(edge);
     }
 
-    // torus knot
-    this.sceneGroup.add(
-      new THREE.Mesh(
-        new THREE.TorusKnotGeometry(0.5, 0.1),
-        new THREE.MeshNormalMaterial()
-      )
+    // bowser model
+    this.gltfLoader = new GLTFLoader();
+
+    this.gltfLoader.load(
+      "https://cdn.glitch.com/06bd98b4-97ee-4c07-a546-fe39ca205034%2Fbowser.glb",
+      (gltf) => {
+        console.log("gltf.scene", gltf.scene);
+        //TODO: these should be set from python
+        gltf.scene.scale.set(0.085, 0.085, 0.085);
+        gltf.scene.position.set(0, -1, 0);
+        this.sceneGroup.add(gltf.scene);
+      },
+      (xhr) => {
+        console.log("loading");
+      },
+      (error) => {
+        console.log("Error loading model");
+      }
     );
 
     // fancy light
@@ -343,9 +343,6 @@ export class MagicCubeView extends DOMWidgetView {
 
   animate() {
     window.requestAnimationFrame(this.animate.bind(this));
-
-    // this.cube.rotation.x += 0.01;
-    // this.cube.rotation.y += 0.01;
 
     this.update();
     this.renderer.render(this.scene, this.camera);
@@ -376,7 +373,8 @@ window.addEventListener("arjs-video-loaded", (e) => {
   console.log("arjs video loaded");
   // Hide video feed from ar.js that shows up behind output cells
   let el = document.querySelector(".a-scene-holder");
-  e.detail.component.classList.add("jl-vid");
+  // e.detail.component.classList.add("jl-vid");
+  e.detail.component.style.display = "";
   el.appendChild(e.detail.component);
   // document.querySelector("#arjs-video").setAttribute("style", "display: none");
 });
@@ -387,4 +385,8 @@ window.addEventListener("markerFound", () => {
 
 window.addEventListener("markerLost", () => {
   console.log("Marker lost");
+});
+
+window.addEventListener("camera-error", () => {
+  console.log("camera error");
 });

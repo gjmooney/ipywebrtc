@@ -1,15 +1,21 @@
 .a-scene-holder {
-  width: 1280px;
-  height: 720px;
+  width: 640px;
+  height: 480px;
   position: relative;
   display: block;
 }
 
 .jl-vid {
-  width: 1280px;
-  height: 720px;
+  width: 640px;
+  height: 480px;
   position: absolute;
   top: 0px;
   left: 0px;
   z-index: -2;
+}
+
+.jl-canvas {
+  position: absolute;
+  top: 0px;
+  left: 0px;
 }

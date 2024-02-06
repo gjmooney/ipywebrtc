@@ -11,6 +11,8 @@ const path = require("path");
 var rules = [
   // { test: /\.json$/, use: "json-loader" },
   { test: /\.css$/, use: ["style-loader", "css-loader"] },
+  { test: /\.png/, type: "asset/resource" },
+  { test: /\.jpg/, type: "asset/resource" },
   { test: /\.patt/, type: "asset/resource" },
 ];
 var externals = [
