@@ -19,6 +19,8 @@ export class MagicCubeModel extends DOMWidgetModel {
       _view_module_version: semver_range,
       scale: [0.085, 0.085, 0.085],
       position: [0, 0, 0],
+      model_url:
+        "https://cdn.glitch.com/06bd98b4-97ee-4c07-a546-fe39ca205034%2Fbowser.glb",
     };
   }
 }
@@ -79,14 +81,6 @@ export class MagicCubeView extends DOMWidgetView {
     this.renderer.domElement.style.left = "0px";
     // this.renderer.domElement.classList.add("jl-canvas");
     this.el.appendChild(this.renderer.domElement);
-
-    // PLAYING WITH CUBE
-    // this.geometry = new THREE.BoxGeometry(1, 1, 1);
-    // this.material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    // this.cube = new THREE.Mesh(this.geometry, this.material);
-    // this.scene.add(this.cube);
-
-    //this.camera.position.z = 5;
   }
 
   setupSource() {
@@ -201,49 +195,12 @@ export class MagicCubeView extends DOMWidgetView {
     this.sceneGroup.add(
       new THREE.Mesh(
         new THREE.BoxGeometry(2, 2, 2),
-        new THREE.MeshBasicMaterial({
+        new THREE.MeshToonMaterial({
           map: this.tileTexture,
           side: THREE.BackSide,
         })
       )
     );
-
-    // cube vertices
-    // this.sphereGeometry = new THREE.SphereGeometry(0.2, 6, 6);
-
-    // this.sphereCenters = [
-    //   new THREE.Vector3(-1, -1, -1),
-    //   new THREE.Vector3(-1, -1, 1),
-    //   new THREE.Vector3(-1, 1, -1),
-    //   new THREE.Vector3(-1, 1, 1),
-    //   new THREE.Vector3(1, -1, -1),
-    //   new THREE.Vector3(1, -1, 1),
-    //   new THREE.Vector3(1, 1, -1),
-    //   new THREE.Vector3(1, 1, 1),
-    // ];
-
-    // this.sphereColors = [
-    //   0x444444,
-    //   0x0000ff,
-    //   0x00ff00,
-    //   0x00ffff,
-    //   0xff0000,
-    //   0xff00ff,
-    //   0xffff00,
-    //   0xffffff,
-    // ];
-
-    // for (let i = 0; i < 8; i++) {
-    //   let sphereMesh = new THREE.Mesh(
-    //     this.sphereGeometry,
-    //     new THREE.MeshLambertMaterial({
-    //       map: this.tileTexture,
-    //       color: this.sphereColors[i],
-    //     })
-    //   );
-    //   sphereMesh.position.copy(this.sphereCenters[i]);
-    //   this.sceneGroup.add(sphereMesh);
-    // }
 
     // cube edges
     this.edgeGeometry = new THREE.CylinderGeometry(0.03, 0.03, 2, 32);
@@ -296,7 +253,7 @@ export class MagicCubeView extends DOMWidgetView {
     for (let i = 0; i < 12; i++) {
       let edge = new THREE.Mesh(
         this.edgeGeometry,
-        new THREE.MeshLambertMaterial({
+        new THREE.MeshToonMaterial({
           map: this.tileTexture,
           color: this.edgeColors[i],
         })
@@ -312,7 +269,7 @@ export class MagicCubeView extends DOMWidgetView {
     this.gltfLoader = new GLTFLoader();
 
     this.gltfLoader.load(
-      "https://cdn.glitch.com/06bd98b4-97ee-4c07-a546-fe39ca205034%2Fbowser.glb",
+      this.model.get("model_url"),
       (gltf) => {
         console.log("gltf.scene", gltf.scene);
         this.gltfModel = gltf.scene;
