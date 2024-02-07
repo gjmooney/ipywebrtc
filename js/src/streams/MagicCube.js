@@ -21,6 +21,7 @@ export class MagicCubeModel extends DOMWidgetModel {
       position: [0, 0, 0],
       model_url:
         "https://cdn.glitch.com/06bd98b4-97ee-4c07-a546-fe39ca205034%2Fbowser.glb",
+      stage_visible: true,
     };
   }
 }
@@ -191,16 +192,15 @@ export class MagicCubeView extends DOMWidgetView {
 
     this.tileTexture = this.loader.load(tiles);
 
-    // reversed cube
-    this.sceneGroup.add(
-      new THREE.Mesh(
-        new THREE.BoxGeometry(2, 2, 2),
-        new THREE.MeshToonMaterial({
-          map: this.tileTexture,
-          side: THREE.BackSide,
-        })
-      )
+    this.stage = new THREE.Mesh(
+      new THREE.BoxGeometry(2, 2, 2),
+      new THREE.MeshToonMaterial({
+        map: this.tileTexture,
+        side: THREE.BackSide,
+      })
     );
+    // reversed cube
+    this.sceneGroup.add(this.stage);
 
     // cube edges
     this.edgeGeometry = new THREE.CylinderGeometry(0.03, 0.03, 2, 32);
@@ -235,34 +235,35 @@ export class MagicCubeView extends DOMWidgetView {
       new THREE.Vector3(Math.PI / 2, 0, 0),
     ];
 
-    this.edgeColors = [
-      0x262626,
-      0x262626,
-      0x262626,
-      0x262626,
-      0x262626,
-      0x262626,
-      0x262626,
-      0x262626,
-      0x262626,
-      0x262626,
-      0x262626,
-      0x262626,
-    ];
+    // this.edgeColors = [
+    //   0x262626,
+    //   0x262626,
+    //   0x262626,
+    //   0x262626,
+    //   0x262626,
+    //   0x262626,
+    //   0x262626,
+    //   0x262626,
+    //   0x262626,
+    //   0x262626,
+    //   0x262626,
+    //   0x262626,
+    // ];
 
     for (let i = 0; i < 12; i++) {
       let edge = new THREE.Mesh(
         this.edgeGeometry,
         new THREE.MeshToonMaterial({
-          map: this.tileTexture,
-          color: this.edgeColors[i],
+          // map: this.tileTexture,
+          // color: this.edgeColors[i],
+          color: 0x262626,
         })
       );
 
       edge.position.copy(this.edgeCenters[i]);
       edge.rotation.setFromVector3(this.edgeRotations[i]);
 
-      this.sceneGroup.add(edge);
+      this.stage.add(edge);
     }
 
     // bowser model
@@ -338,9 +339,18 @@ export class MagicCubeView extends DOMWidgetView {
     this.listenTo(this.model, "change:scale", () => {
       this.gltfModel.scale.fromArray(this.model.get("scale"));
     });
+
+    this.listenTo(this.model, "change:stage_visible", () => {
+      if (this.model.get("stage_visible")) {
+        this.stage.visible = true;
+      } else {
+        this.stage.visible = false;
+      }
+    });
   }
 }
 
+// TODO: HAs to be a better way
 window.addEventListener("arjs-video-loaded", (e) => {
   console.log("arjs video loaded");
   // Hide video feed from ar.js that shows up behind output cells
