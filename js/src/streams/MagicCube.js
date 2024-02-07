@@ -22,6 +22,8 @@ export class MagicCubeModel extends DOMWidgetModel {
       model_url:
         "https://cdn.glitch.com/06bd98b4-97ee-4c07-a546-fe39ca205034%2Fbowser.glb",
       stage_visible: true,
+      width: 640,
+      height: 480,
     };
   }
 }
@@ -36,7 +38,7 @@ export class MagicCubeView extends DOMWidgetView {
     console.log('this.model.get("scale")', this.model.get("scale"));
     console.log("initial");
 
-    this.el.classList.add("a-scene-holder");
+    this.el.classList.add("findthis");
 
     console.log("Start three stuff");
     this.setupThreeStuff();
@@ -67,7 +69,7 @@ export class MagicCubeView extends DOMWidgetView {
       75,
       window.innerWidth / window.innerHeight,
       0.1,
-      1000
+      1000,
     );
     this.scene.add(this.camera);
 
@@ -76,7 +78,7 @@ export class MagicCubeView extends DOMWidgetView {
       alpha: true,
     });
     this.renderer.setClearColor(new THREE.Color("lightgrey"), 0);
-    this.renderer.setSize(640, 480);
+    this.renderer.setSize(this.model.get("width"), this.model.get("height"));
     this.renderer.domElement.style.position = "absolute";
     this.renderer.domElement.style.top = "0px";
     this.renderer.domElement.style.left = "0px";
@@ -87,8 +89,11 @@ export class MagicCubeView extends DOMWidgetView {
   setupSource() {
     this.arToolkitSource = new THREEx.ArToolkitSource({
       sourceType: "webcam",
-      // sourceWidth: "1280px",
-      // sourceHeight: "720px",
+      // source height/width used to set ideal in userMediaConstraints
+      sourceWidth: this.model.get("width"),
+      sourceHeight: this.model.get("height"),
+      displayWidth: this.model.get("width"),
+      displayHeight: this.model.get("height"),
     });
 
     this.arToolkitSource.init(function onReady() {
@@ -112,7 +117,7 @@ export class MagicCubeView extends DOMWidgetView {
     // copy projection matrix to camera when initialization complete
     this.arToolkitContext.init(() => {
       this.camera.projectionMatrix.copy(
-        this.arToolkitContext.getProjectionMatrix()
+        this.arToolkitContext.getProjectionMatrix(),
       );
     });
   }
@@ -165,10 +170,8 @@ export class MagicCubeView extends DOMWidgetView {
             this.patternArray[i] +
             ".patt",
           // new URL("../../data/" + this.patternArray[i] + ".patt",import.meta.url),
-        }
+        },
       );
-
-      //THREEx.ArToolkitContext.baseURL
 
       this.markerGroup = new THREE.Group();
       this.markerGroupArray.push(this.markerGroup);
@@ -197,7 +200,7 @@ export class MagicCubeView extends DOMWidgetView {
       new THREE.MeshToonMaterial({
         map: this.tileTexture,
         side: THREE.BackSide,
-      })
+      }),
     );
     // reversed cube
     this.sceneGroup.add(this.stage);
@@ -235,29 +238,12 @@ export class MagicCubeView extends DOMWidgetView {
       new THREE.Vector3(Math.PI / 2, 0, 0),
     ];
 
-    // this.edgeColors = [
-    //   0x262626,
-    //   0x262626,
-    //   0x262626,
-    //   0x262626,
-    //   0x262626,
-    //   0x262626,
-    //   0x262626,
-    //   0x262626,
-    //   0x262626,
-    //   0x262626,
-    //   0x262626,
-    //   0x262626,
-    // ];
-
     for (let i = 0; i < 12; i++) {
       let edge = new THREE.Mesh(
         this.edgeGeometry,
         new THREE.MeshToonMaterial({
-          // map: this.tileTexture,
-          // color: this.edgeColors[i],
           color: 0x262626,
-        })
+        }),
       );
 
       edge.position.copy(this.edgeCenters[i]);
@@ -266,7 +252,7 @@ export class MagicCubeView extends DOMWidgetView {
       this.stage.add(edge);
     }
 
-    // bowser model
+    // gltf model
     this.gltfLoader = new GLTFLoader();
 
     this.gltfLoader.load(
@@ -284,7 +270,7 @@ export class MagicCubeView extends DOMWidgetView {
       },
       (error) => {
         console.log("Error loading model", error);
-      }
+      },
     );
 
     // fancy light
@@ -298,7 +284,7 @@ export class MagicCubeView extends DOMWidgetView {
     this.arToolkitSource.copySizeTo(this.renderer.domElement);
     if (this.arToolkitContext.arController !== null) {
       this.arToolkitSource.copySizeTo(
-        this.arToolkitContext.arController.canvas
+        this.arToolkitContext.arController.canvas,
       );
     }
   }
@@ -350,11 +336,11 @@ export class MagicCubeView extends DOMWidgetView {
   }
 }
 
-// TODO: HAs to be a better way
+// TODO: Has to be a better way
 window.addEventListener("arjs-video-loaded", (e) => {
   console.log("arjs video loaded");
   // Hide video feed from ar.js that shows up behind output cells
-  let el = document.querySelector(".a-scene-holder");
+  let el = document.querySelector(".findthis");
   // e.detail.component.classList.add("jl-vid");
   e.detail.component.style.display = "";
   el.appendChild(e.detail.component);
