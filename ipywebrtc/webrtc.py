@@ -778,5 +778,9 @@ class MagicCube(DOMWidget):
     scale = List([0.085, 0.085, 0.085]).tag(sync=True)
     model_url = Unicode().tag(sync=True)
     stage_visible = Bool(True).tag(sync=True)
+
+    bg = Unicode().tag(sync=True)
+
+    # TODO: Used during camera initialization, don't sync?
     width = Int(640).tag(sync=True)
     height = Int(480).tag(sync=True)

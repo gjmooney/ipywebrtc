@@ -3,7 +3,7 @@ import { DOMWidgetModel, DOMWidgetView } from "@jupyter-widgets/base";
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-import tiles from "../../../images/tiles.jpg";
+import blueBg from "../../../images/bg.jpg";
 
 const semver_range = "~" + require("../../package.json").version;
 
@@ -38,7 +38,7 @@ export class MagicCubeView extends DOMWidgetView {
     console.log('this.model.get("scale")', this.model.get("scale"));
     console.log("initial");
 
-    this.el.classList.add("findthis");
+    this.el.classList.add("ar-container");
 
     console.log("Start three stuff");
     this.setupThreeStuff();
@@ -67,7 +67,7 @@ export class MagicCubeView extends DOMWidgetView {
     // TODO: Use good settings
     this.camera = new THREE.PerspectiveCamera(
       75,
-      window.innerWidth / window.innerHeight,
+      this.el.innerWidth / this.el.innerHeight,
       0.1,
       1000,
     );
@@ -82,7 +82,6 @@ export class MagicCubeView extends DOMWidgetView {
     this.renderer.domElement.style.position = "absolute";
     this.renderer.domElement.style.top = "0px";
     this.renderer.domElement.style.left = "0px";
-    // this.renderer.domElement.classList.add("jl-canvas");
     this.el.appendChild(this.renderer.domElement);
   }
 
@@ -181,24 +180,24 @@ export class MagicCubeView extends DOMWidgetView {
 
       this.markerRoot.add(this.markerGroup);
     }
-
-    console.log("markerRootArray", this.markerRootArray);
   }
 
   setupScene() {
     this.sceneGroup = new THREE.Group();
 
     // a 1x1x1 cube model with scale factor 1.25 fills up the physical cube
-    this.sceneGroup.scale.set(1.25 / 2, 1.25 / 2, 1.25 / 2);
+    this.sceneGroup.scale.set(1.75 / 2, 1.75 / 2, 1.75 / 2);
 
     this.loader = new THREE.TextureLoader();
 
-    this.tileTexture = this.loader.load(tiles);
+    // TODO: Let user set image
+    this.stageTextureImage = this.model.get("bg") || blueBg;
+    this.stageTexture = this.loader.load(this.stageTextureImage);
 
     this.stage = new THREE.Mesh(
       new THREE.BoxGeometry(2, 2, 2),
-      new THREE.MeshToonMaterial({
-        map: this.tileTexture,
+      new THREE.MeshBasicMaterial({
+        map: this.stageTexture,
         side: THREE.BackSide,
       }),
     );
@@ -241,7 +240,7 @@ export class MagicCubeView extends DOMWidgetView {
     for (let i = 0; i < 12; i++) {
       let edge = new THREE.Mesh(
         this.edgeGeometry,
-        new THREE.MeshToonMaterial({
+        new THREE.MeshLambertMaterial({
           color: 0x262626,
         }),
       );
@@ -340,7 +339,7 @@ export class MagicCubeView extends DOMWidgetView {
 window.addEventListener("arjs-video-loaded", (e) => {
   console.log("arjs video loaded");
   // Hide video feed from ar.js that shows up behind output cells
-  let el = document.querySelector(".findthis");
+  let el = document.querySelector(".ar-container");
   // e.detail.component.classList.add("jl-vid");
   e.detail.component.style.display = "";
   el.appendChild(e.detail.component);
