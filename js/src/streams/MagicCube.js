@@ -68,13 +68,13 @@ export class MagicCubeView extends DOMWidgetView {
     this.scene.add(this.ambientLight);
 
     // TODO: Use good settings
-    // this.camera = new THREE.PerspectiveCamera(
-    //   75,
-    //   this.el.innerWidth / this.el.innerHeight,
-    //   0.1,
-    //   1000,
-    // );
-    // this.scene.add(this.camera);
+    this.camera = new THREE.PerspectiveCamera(
+      75,
+      this.el.innerWidth / this.el.innerHeight,
+      0.1,
+      1000,
+    );
+    this.scene.add(this.camera);
 
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
