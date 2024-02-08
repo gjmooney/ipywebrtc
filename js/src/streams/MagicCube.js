@@ -61,23 +61,26 @@ export class MagicCubeView extends DOMWidgetView {
   setupThreeStuff() {
     this.scene = new THREE.Scene();
 
+    // TODO: Add this as a python option
+    // this.scene.background = new THREE.TextureLoader().load(blueBg);
+
     this.ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
     this.scene.add(this.ambientLight);
 
     // TODO: Use good settings
-    this.camera = new THREE.PerspectiveCamera(
-      75,
-      this.el.innerWidth / this.el.innerHeight,
-      0.1,
-      1000,
-    );
-    this.scene.add(this.camera);
+    // this.camera = new THREE.PerspectiveCamera(
+    //   75,
+    //   this.el.innerWidth / this.el.innerHeight,
+    //   0.1,
+    //   1000,
+    // );
+    // this.scene.add(this.camera);
 
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
     });
-    this.renderer.setClearColor(new THREE.Color("lightgrey"), 0);
+    // this.renderer.setClearColor(new THREE.Color("lightgrey"), 0);
     this.renderer.setSize(this.model.get("width"), this.model.get("height"));
     this.renderer.domElement.style.position = "absolute";
     this.renderer.domElement.style.top = "0px";
@@ -104,6 +107,8 @@ export class MagicCubeView extends DOMWidgetView {
       console.log("window listener");
       this.onResize();
     });
+
+    console.log("this.arToolkitSource", this.arToolkitSource);
   }
 
   setupContext() {
