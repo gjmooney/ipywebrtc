@@ -34,7 +34,7 @@ export class MagicCubeModel extends DOMWidgetModel {
     this.setupContext();
     this.setupMarkerRoots();
     this.setupScene();
-    this.animate();
+    // this.animate();
   }
 
   setupThreeStuff() {
@@ -55,17 +55,6 @@ export class MagicCubeModel extends DOMWidgetModel {
     // );
     this.camera = new THREE.Camera();
     this.scene.add(this.camera);
-
-    this.renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-    });
-
-    // this.renderer.setClearColor(new THREE.Color("lightgrey"), 0);
-    this.renderer.setSize(this.get("width"), this.get("height"));
-    this.renderer.domElement.style.position = "absolute";
-    this.renderer.domElement.style.top = "0px";
-    this.renderer.domElement.style.left = "0px";
   }
 
   setupSource() {
@@ -270,32 +259,11 @@ export class MagicCubeModel extends DOMWidgetModel {
 
   onResize() {
     this.arToolkitSource.onResize();
-    this.arToolkitSource.copySizeTo(this.renderer.domElement);
+    // this.arToolkitSource.copySizeTo(this.renderer.domElement);
     if (this.arToolkitContext.arController !== null) {
       this.arToolkitSource.copySizeTo(
         this.arToolkitContext.arController.canvas,
       );
-    }
-  }
-
-  animate() {
-    window.requestAnimationFrame(this.animate.bind(this));
-
-    this.update();
-    this.renderer.render(this.scene, this.camera);
-  }
-
-  update() {
-    // update artoolkit on every frame
-    if (this.arToolkitSource.ready !== false)
-      this.arToolkitContext.update(this.arToolkitSource.domElement);
-
-    for (let i = 0; i < 6; i++) {
-      if (this.markerRootArray[i].visible) {
-        this.markerGroupArray[i].add(this.sceneGroup);
-        console.log("visible: " + this.patternArray[i]);
-        break;
-      }
     }
   }
 }
@@ -309,13 +277,81 @@ export class MagicCubeView extends DOMWidgetView {
 
   render() {
     super.render();
+    this.setupRenderer();
+    this.animate();
 
     this.el.classList.add("ar-container");
 
-    this.el.appendChild(this.model.renderer.domElement);
+    this.el.appendChild(this.renderer.domElement);
     this.model_events();
 
+    console.log(
+      "Object.keys(this.model.views).length",
+      Object.keys(this.model.views).length,
+    );
+    console.log("this.model.views.length", this.model.views.length);
+
+    // Make a new video for subsequent views
+    if (Object.keys(this.model.views).length > 1) {
+      this.existingWebcam = document.querySelector("#arjs-video");
+      this.newWebcam = document.createElement("video");
+
+      this.newWebcam.srcObject = this.existingWebcam.srcObject;
+
+      // this.newWebcam.width = this.existingWebcam.width;
+      // this.newWebcam.height = this.existingWebcam.height;
+      this.newWebcam.playsinline = this.existingWebcam.playsinline;
+      this.newWebcam.autoplay = this.existingWebcam.autoplay;
+      this.newWebcam.muted = this.existingWebcam.muted;
+      this.newWebcam.style = this.existingWebcam.style;
+      this.newWebcam.id = `webcamView${Object.keys(this.model.views).length}`;
+
+      // let webclone = webcam.cloneNode(true);
+      this.el.appendChild(this.newWebcam);
+
+      if (this.newWebcam.srcObject instanceof MediaStream) {
+        let existingStream = this.newWebcam.srcObject;
+        console.log("Existing MediaStream:", existingStream);
+      } else {
+        console.log("fuuucks");
+      }
+    }
+
     console.log("scene", "render");
+  }
+
+  setupRenderer() {
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+    });
+
+    this.renderer.setClearColor(new THREE.Color("lightgrey"), 0);
+    this.renderer.setSize(this.model.get("width"), this.model.get("height"));
+    this.renderer.domElement.style.position = "absolute";
+    this.renderer.domElement.style.top = "0px";
+    this.renderer.domElement.style.left = "0px";
+  }
+
+  animate() {
+    window.requestAnimationFrame(this.animate.bind(this));
+
+    this.update();
+    this.renderer.render(this.model.scene, this.model.camera);
+  }
+
+  update() {
+    // update artoolkit on every frame
+    if (this.model.arToolkitSource.ready !== false)
+      this.model.arToolkitContext.update(this.model.arToolkitSource.domElement);
+
+    for (let i = 0; i < 6; i++) {
+      if (this.model.markerRootArray[i].visible) {
+        this.model.markerGroupArray[i].add(this.model.sceneGroup);
+        console.log("visible: " + this.model.patternArray[i]);
+        break;
+      }
+    }
   }
 
   model_events() {
