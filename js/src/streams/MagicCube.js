@@ -285,36 +285,14 @@ export class MagicCubeView extends DOMWidgetView {
     this.el.appendChild(this.renderer.domElement);
     this.model_events();
 
-    console.log(
-      "Object.keys(this.model.views).length",
-      Object.keys(this.model.views).length,
-    );
-    console.log("this.model.views.length", this.model.views.length);
-
     // Make a new video for subsequent views
     if (Object.keys(this.model.views).length > 1) {
       this.existingWebcam = document.querySelector("#arjs-video");
-      this.newWebcam = document.createElement("video");
-
+      this.newWebcam = this.existingWebcam.cloneNode(true);
       this.newWebcam.srcObject = this.existingWebcam.srcObject;
-
-      // this.newWebcam.width = this.existingWebcam.width;
-      // this.newWebcam.height = this.existingWebcam.height;
-      this.newWebcam.playsinline = this.existingWebcam.playsinline;
-      this.newWebcam.autoplay = this.existingWebcam.autoplay;
-      this.newWebcam.muted = this.existingWebcam.muted;
-      this.newWebcam.style = this.existingWebcam.style;
       this.newWebcam.id = `webcamView${Object.keys(this.model.views).length}`;
 
-      // let webclone = webcam.cloneNode(true);
       this.el.appendChild(this.newWebcam);
-
-      if (this.newWebcam.srcObject instanceof MediaStream) {
-        let existingStream = this.newWebcam.srcObject;
-        console.log("Existing MediaStream:", existingStream);
-      } else {
-        console.log("fuuucks");
-      }
     }
 
     console.log("scene", "render");
