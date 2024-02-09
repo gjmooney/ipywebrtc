@@ -314,13 +314,6 @@ export class MagicCubeView extends DOMWidgetView {
 
     this.el.appendChild(this.model.renderer.domElement);
     this.model_events();
-    this.arjsVideo = document.querySelector("#arjs-video");
-
-    if (this.arjsVideo) {
-      console.log("booty");
-      this.arjsVideo.style.display = "";
-      this.el.appendChild(this.arjsVideo);
-    }
 
     console.log("scene", "render");
   }
@@ -342,26 +335,23 @@ export class MagicCubeView extends DOMWidgetView {
       }
     });
 
-    this.addEventListener("arjs-video-loaded", () => {
-      console.log("view event event listener");
-    });
-
-    this.listenTo(window, "arjs-video-loaded", () => {
-      console.log("view event listen to");
+    // TODO: Should this be here or top level?
+    window.addEventListener("arjs-video-loaded", (e) => {
+      console.log("arjs video loaded");
+      let el = document.querySelector(".ar-container");
+      e.detail.component.style.display = "";
+      el.appendChild(e.detail.component);
     });
   }
 }
 
 // TODO: Has to be a better way
-window.addEventListener("arjs-video-loaded", (e) => {
-  console.log("arjs video loaded");
-  // Hide video feed from ar.js that shows up behind output cells
-  let el = document.querySelector(".ar-container");
-  // e.detail.component.classList.add("jl-vid");
-  e.detail.component.style.display = "";
-  el.appendChild(e.detail.component);
-  // document.querySelector("#arjs-video").setAttribute("style", "display: none");
-});
+// window.addEventListener("arjs-video-loaded", (e) => {
+//   console.log("arjs video loaded");
+//   let el = document.querySelector(".ar-container");
+//   e.detail.component.style.display = "";
+//   el.appendChild(e.detail.component);
+// });
 
 window.addEventListener("markerFound", () => {
   console.log("Marker found");
