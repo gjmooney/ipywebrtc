@@ -26,36 +26,15 @@ export class MagicCubeModel extends DOMWidgetModel {
       height: 480,
     };
   }
-}
 
-MagicCubeModel.serializers = {
-  ...DOMWidgetModel.serializers,
-};
-
-export class MagicCubeView extends DOMWidgetView {
-  // base url = https://ar-js-org.github.io/AR.js/three.js/
-  initialize() {
-    console.log('this.model.get("scale")', this.model.get("scale"));
-    console.log("initial");
-
-    this.el.classList.add("ar-container");
-
-    console.log("Start three stuff");
+  initialize(attributes, options) {
+    super.initialize(attributes, options);
     this.setupThreeStuff();
-
-    console.log("start source");
     this.setupSource();
-
-    console.log("start context");
     this.setupContext();
-
-    console.log("start marker roots");
     this.setupMarkerRoots();
-
-    console.log("start scene");
     this.setupScene();
-
-    console.log("this.scene", this.scene);
+    this.animate();
   }
 
   setupThreeStuff() {
@@ -68,50 +47,54 @@ export class MagicCubeView extends DOMWidgetView {
     this.scene.add(this.ambientLight);
 
     // TODO: Use good settings
-    this.camera = new THREE.PerspectiveCamera(
-      75,
-      this.el.innerWidth / this.el.innerHeight,
-      0.1,
-      1000,
-    );
+    // this.camera = new THREE.PerspectiveCamera(
+    //   75,
+    //   this.el.innerWidth / this.el.innerHeight,
+    //   0.1,
+    //   1000,
+    // );
+    this.camera = new THREE.Camera();
     this.scene.add(this.camera);
 
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
     });
+
     // this.renderer.setClearColor(new THREE.Color("lightgrey"), 0);
-    this.renderer.setSize(this.model.get("width"), this.model.get("height"));
+    this.renderer.setSize(this.get("width"), this.get("height"));
     this.renderer.domElement.style.position = "absolute";
     this.renderer.domElement.style.top = "0px";
     this.renderer.domElement.style.left = "0px";
-    this.el.appendChild(this.renderer.domElement);
   }
 
   setupSource() {
+    console.log("setup source one");
     this.arToolkitSource = new THREEx.ArToolkitSource({
       sourceType: "webcam",
       // source height/width used to set ideal in userMediaConstraints
-      sourceWidth: this.model.get("width"),
-      sourceHeight: this.model.get("height"),
-      displayWidth: this.model.get("width"),
-      displayHeight: this.model.get("height"),
+      sourceWidth: this.get("width"),
+      sourceHeight: this.get("height"),
+      displayWidth: this.get("width"),
+      displayHeight: this.get("height"),
     });
 
+    console.log("setup source two");
     this.arToolkitSource.init(function onReady() {
       this.onResize();
     });
 
+    console.log("setup source three");
     // handle resize event
     window.addEventListener("resize", function () {
-      console.log("window listener");
+      console.log("setup source window listener");
       this.onResize();
     });
-
-    console.log("this.arToolkitSource", this.arToolkitSource);
+    console.log("setup source four");
   }
 
   setupContext() {
+    console.log("context setup");
     this.arToolkitContext = new THREEx.ArToolkitContext({
       cameraParametersUrl:
         THREEx.ArToolkitContext.baseURL + "../data/data/camera_para.dat",
@@ -127,6 +110,7 @@ export class MagicCubeView extends DOMWidgetView {
   }
 
   setupMarkerRoots() {
+    console.log("marker root setup");
     this.markerRootArray = [];
     this.markerGroupArray = [];
     // this.patternArray = [
@@ -188,6 +172,7 @@ export class MagicCubeView extends DOMWidgetView {
   }
 
   setupScene() {
+    console.log("scene setup");
     this.sceneGroup = new THREE.Group();
 
     // a 1x1x1 cube model with scale factor 1.25 fills up the physical cube
@@ -196,9 +181,10 @@ export class MagicCubeView extends DOMWidgetView {
     this.loader = new THREE.TextureLoader();
 
     // TODO: Let user set image
-    this.stageTextureImage = this.model.get("bg") || blueBg;
+    this.stageTextureImage = this.get("bg") || blueBg;
     this.stageTexture = this.loader.load(this.stageTextureImage);
 
+    // reversed cube
     this.stage = new THREE.Mesh(
       new THREE.BoxGeometry(2, 2, 2),
       new THREE.MeshBasicMaterial({
@@ -206,7 +192,6 @@ export class MagicCubeView extends DOMWidgetView {
         side: THREE.BackSide,
       }),
     );
-    // reversed cube
     this.sceneGroup.add(this.stage);
 
     // cube edges
@@ -260,13 +245,13 @@ export class MagicCubeView extends DOMWidgetView {
     this.gltfLoader = new GLTFLoader();
 
     this.gltfLoader.load(
-      this.model.get("model_url"),
+      this.get("model_url"),
       (gltf) => {
         console.log("gltf.scene", gltf.scene);
         this.gltfModel = gltf.scene;
         //TODO: these should be set from python
-        this.gltfModel.scale.fromArray(this.model.get("scale"));
-        this.gltfModel.position.fromArray(this.model.get("position"));
+        this.gltfModel.scale.fromArray(this.get("scale"));
+        this.gltfModel.position.fromArray(this.get("position"));
         this.sceneGroup.add(this.gltfModel);
       },
       () => {
@@ -313,29 +298,56 @@ export class MagicCubeView extends DOMWidgetView {
       }
     }
   }
+}
+
+MagicCubeModel.serializers = {
+  ...DOMWidgetModel.serializers,
+};
+
+export class MagicCubeView extends DOMWidgetView {
+  // base url = https://ar-js-org.github.io/AR.js/three.js/
 
   render() {
     super.render();
+
+    this.el.classList.add("ar-container");
+
+    this.el.appendChild(this.model.renderer.domElement);
     this.model_events();
-    this.animate();
+    this.arjsVideo = document.querySelector("#arjs-video");
+
+    if (this.arjsVideo) {
+      console.log("booty");
+      this.arjsVideo.style.display = "";
+      this.el.appendChild(this.arjsVideo);
+    }
+
     console.log("scene", "render");
   }
 
   model_events() {
     this.listenTo(this.model, "change:position", () => {
-      this.gltfModel.position.fromArray(this.model.get("position"));
+      this.model.gltfModel.position.fromArray(this.model.get("position"));
     });
 
     this.listenTo(this.model, "change:scale", () => {
-      this.gltfModel.scale.fromArray(this.model.get("scale"));
+      this.model.gltfModel.scale.fromArray(this.model.get("scale"));
     });
 
     this.listenTo(this.model, "change:stage_visible", () => {
       if (this.model.get("stage_visible")) {
-        this.stage.visible = true;
+        this.model.stage.visible = true;
       } else {
-        this.stage.visible = false;
+        this.model.stage.visible = false;
       }
+    });
+
+    this.addEventListener("arjs-video-loaded", () => {
+      console.log("view event event listener");
+    });
+
+    this.listenTo(window, "arjs-video-loaded", () => {
+      console.log("view event listen to");
     });
   }
 }
