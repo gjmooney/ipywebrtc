@@ -775,7 +775,7 @@ class MagicCube(DOMWidget):
     _model_module_version = Unicode("0.6.0").tag(sync=True)
 
     position = List([0, -1, 0]).tag(sync=True)
-    scale = List([0.085, 0.085, 0.085]).tag(sync=True)
+    scale = List([1, 1, 1]).tag(sync=True)
     model_url = Unicode().tag(sync=True)
     stage_visible = Bool(True).tag(sync=True)
 

@@ -29,6 +29,22 @@ export class MagicCubeModel extends DOMWidgetModel {
 
   initialize(attributes, options) {
     super.initialize(attributes, options);
+    this.event_fired = new Promise((resolve) => {
+      this.resolve = resolve;
+    });
+
+    // TODO: Should this be here or top level?
+    window.addEventListener("arjs-video-loaded", (e) => {
+      // console.log("arjs video loaded");
+      // let el = document.querySelector(".ar-container");
+      // e.detail.component.style.display = "";
+      // el.appendChild(e.detail.component);
+
+      console.log("arjs video loaded", this.event_fired);
+      this.resolve();
+      console.log("arjs video resolved", this.event_fired);
+    });
+
     this.setupThreeStuff();
     this.setupSource();
     this.setupContext();
@@ -58,7 +74,6 @@ export class MagicCubeModel extends DOMWidgetModel {
   }
 
   setupSource() {
-    console.log("setup source one");
     this.arToolkitSource = new THREEx.ArToolkitSource({
       sourceType: "webcam",
       // source height/width used to set ideal in userMediaConstraints
@@ -68,18 +83,15 @@ export class MagicCubeModel extends DOMWidgetModel {
       displayHeight: this.get("height"),
     });
 
-    console.log("setup source two");
     this.arToolkitSource.init(function onReady() {
       this.onResize();
     });
 
-    console.log("setup source three");
     // handle resize event
     window.addEventListener("resize", function () {
       console.log("setup source window listener");
       this.onResize();
     });
-    console.log("setup source four");
   }
 
   setupContext() {
@@ -236,7 +248,6 @@ export class MagicCubeModel extends DOMWidgetModel {
     this.gltfLoader.load(
       this.get("model_url"),
       (gltf) => {
-        console.log("gltf.scene", gltf.scene);
         this.gltfModel = gltf.scene;
         //TODO: these should be set from python
         this.gltfModel.scale.fromArray(this.get("scale"));
@@ -244,7 +255,7 @@ export class MagicCubeModel extends DOMWidgetModel {
         this.sceneGroup.add(this.gltfModel);
       },
       () => {
-        console.log("loading");
+        console.log("model loading");
       },
       (error) => {
         console.log("Error loading model", error);
@@ -275,28 +286,36 @@ MagicCubeModel.serializers = {
 export class MagicCubeView extends DOMWidgetView {
   // base url = https://ar-js-org.github.io/AR.js/three.js/
 
-  render() {
+  async render() {
+    // Check if webcam feed already exists
+    this.wc = document.getElementById("arjs-video");
+
+    // Wait for AR.js to set up webcam feed before rendering view
+    if (!this.wc) {
+      await this.model.event_fired;
+    }
+
     super.render();
     this.setupRenderer();
     this.animate();
+    this.model_events();
 
     this.el.classList.add("ar-container");
 
     this.el.appendChild(this.renderer.domElement);
-    this.model_events();
 
-    // Make a new video for subsequent views
-    if (Object.keys(this.model.views).length > 1) {
-      this.existingWebcam = document.querySelector("#arjs-video");
-      this.newWebcam = this.existingWebcam.cloneNode(true);
-      this.newWebcam.srcObject = this.existingWebcam.srcObject;
-      this.newWebcam.id = `webcamView${Object.keys(this.model.views).length}`;
+    this.existingWebcam = document.getElementById("arjs-video");
+    this.newWebcam = this.existingWebcam.cloneNode(true);
+    this.newWebcam.srcObject = this.existingWebcam.srcObject;
+    this.newWebcam.id = `webcamView${Object.keys(this.model.views).length}`;
+    this.newWebcam.style.display = "";
 
-      this.el.appendChild(this.newWebcam);
-    }
+    this.el.appendChild(this.newWebcam);
 
     console.log("scene", "render");
   }
+
+  finishRender() {}
 
   setupRenderer() {
     this.renderer = new THREE.WebGLRenderer({
@@ -347,14 +366,6 @@ export class MagicCubeView extends DOMWidgetView {
       } else {
         this.model.stage.visible = false;
       }
-    });
-
-    // TODO: Should this be here or top level?
-    window.addEventListener("arjs-video-loaded", (e) => {
-      console.log("arjs video loaded");
-      let el = document.querySelector(".ar-container");
-      e.detail.component.style.display = "";
-      el.appendChild(e.detail.component);
     });
   }
 }
