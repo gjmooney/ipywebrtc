@@ -35,14 +35,7 @@ export class MagicCubeModel extends DOMWidgetModel {
 
     // TODO: Should this be here or top level?
     window.addEventListener("arjs-video-loaded", (e) => {
-      // console.log("arjs video loaded");
-      // let el = document.querySelector(".ar-container");
-      // e.detail.component.style.display = "";
-      // el.appendChild(e.detail.component);
-
-      console.log("arjs video loaded", this.event_fired);
       this.resolve();
-      console.log("arjs video resolved", this.event_fired);
     });
 
     this.setupThreeStuff();
@@ -62,13 +55,6 @@ export class MagicCubeModel extends DOMWidgetModel {
     this.ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
     this.scene.add(this.ambientLight);
 
-    // TODO: Use good settings
-    // this.camera = new THREE.PerspectiveCamera(
-    //   75,
-    //   this.el.innerWidth / this.el.innerHeight,
-    //   0.1,
-    //   1000,
-    // );
     this.camera = new THREE.Camera();
     this.scene.add(this.camera);
   }
@@ -250,7 +236,6 @@ export class MagicCubeModel extends DOMWidgetModel {
       (gltf) => {
         let scale = this.get("scale");
         this.gltfModel = gltf.scene;
-        //TODO: these should be set from python
         this.gltfModel.scale.set(scale, scale, scale);
         this.gltfModel.position.fromArray(this.get("position"));
         this.sceneGroup.add(this.gltfModel);
@@ -300,10 +285,10 @@ export class MagicCubeView extends DOMWidgetView {
 
   async render() {
     // Check if webcam feed already exists
-    this.wc = document.getElementById("arjs-video");
+    this.webcamFromArjs = document.getElementById("arjs-video");
 
     // Wait for AR.js to set up webcam feed before rendering view
-    if (!this.wc) {
+    if (!this.webcamFromArjs) {
       await this.model.event_fired;
     }
 
@@ -326,8 +311,6 @@ export class MagicCubeView extends DOMWidgetView {
 
     console.log("scene", "render");
   }
-
-  finishRender() {}
 
   setupRenderer() {
     this.renderer = new THREE.WebGLRenderer({
@@ -382,14 +365,6 @@ export class MagicCubeView extends DOMWidgetView {
     });
   }
 }
-
-// TODO: Has to be a better way
-// window.addEventListener("arjs-video-loaded", (e) => {
-//   console.log("arjs video loaded");
-//   let el = document.querySelector(".ar-container");
-//   e.detail.component.style.display = "";
-//   el.appendChild(e.detail.component);
-// });
 
 window.addEventListener("markerFound", () => {
   console.log("Marker found");
