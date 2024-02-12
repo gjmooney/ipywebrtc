@@ -17,10 +17,10 @@ export class MagicCubeModel extends DOMWidgetModel {
       _view_name: "MagicCubeView",
       _model_module_version: semver_range,
       _view_module_version: semver_range,
-      scale: [0.085, 0.085, 0.085],
+      scale: 1.0,
       position: [0, 0, 0],
       model_url:
-        "https://cdn.glitch.com/06bd98b4-97ee-4c07-a546-fe39ca205034%2Fbowser.glb",
+        "https://github.khronos.org/glTF-Sample-Viewer-Release/assets/models/Models/Duck/glTF/Duck.gltf",
       stage_visible: true,
       width: 640,
       height: 480,
@@ -248,9 +248,10 @@ export class MagicCubeModel extends DOMWidgetModel {
     this.gltfLoader.load(
       this.get("model_url"),
       (gltf) => {
+        let scale = this.get("scale");
         this.gltfModel = gltf.scene;
         //TODO: these should be set from python
-        this.gltfModel.scale.fromArray(this.get("scale"));
+        this.gltfModel.scale.set(scale, scale, scale);
         this.gltfModel.position.fromArray(this.get("position"));
         this.sceneGroup.add(this.gltfModel);
       },
@@ -276,6 +277,17 @@ export class MagicCubeModel extends DOMWidgetModel {
         this.arToolkitContext.arController.canvas,
       );
     }
+  }
+
+  close() {
+    if (this.cameraStream) {
+      this.cameraStream.then((stream) => {
+        stream.getTracks().forEach((track) => {
+          track.stop();
+        });
+      });
+    }
+    return super.close.apply(this, arguments);
   }
 }
 
@@ -357,7 +369,8 @@ export class MagicCubeView extends DOMWidgetView {
     });
 
     this.listenTo(this.model, "change:scale", () => {
-      this.model.gltfModel.scale.fromArray(this.model.get("scale"));
+      let scale = this.model.get("scale");
+      this.model.gltfModel.scale.set(scale, scale, scale);
     });
 
     this.listenTo(this.model, "change:stage_visible", () => {
