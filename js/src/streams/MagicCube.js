@@ -228,14 +228,38 @@ export class MagicCubeModel extends DOMWidgetModel {
       this.stage.add(edge);
     }
 
+    this.loadModel();
+
+    // fancy light
+    this.pointLight = new THREE.PointLight(0xffffff, 1, 50);
+    this.pointLight.position.set(0.5, 3, 2);
+    this.scene.add(this.pointLight);
+  }
+
+  loadModel() {
+    // instantiate loader
+    console.log("start load");
+    if (!this.gltfLoader) {
+      this.gltfLoader = new GLTFLoader();
+    }
+    console.log("start load 2");
+
+    // remove old model first
+    if (this.gltfModel) {
+      this.sceneGroup.remove(this.gltfModel);
+    }
     // gltf model
-    this.gltfLoader = new GLTFLoader();
+    console.log("start load 3");
 
     this.gltfLoader.load(
       this.get("model_url"),
       (gltf) => {
+        console.log("start load 4");
+
         let scale = this.get("scale");
         this.gltfModel = gltf.scene;
+        console.log("gltf.scene", gltf.scene);
+        console.log("this.gltfModel", this.gltfModel);
         this.gltfModel.scale.set(scale, scale, scale);
         this.gltfModel.position.fromArray(this.get("position"));
         this.sceneGroup.add(this.gltfModel);
@@ -248,10 +272,7 @@ export class MagicCubeModel extends DOMWidgetModel {
       },
     );
 
-    // fancy light
-    this.pointLight = new THREE.PointLight(0xffffff, 1, 50);
-    this.pointLight.position.set(0.5, 3, 2);
-    this.scene.add(this.pointLight);
+    console.log("start load 5");
   }
 
   onResize() {
@@ -354,6 +375,10 @@ export class MagicCubeView extends DOMWidgetView {
     this.listenTo(this.model, "change:scale", () => {
       let scale = this.model.get("scale");
       this.model.gltfModel.scale.set(scale, scale, scale);
+    });
+
+    this.listenTo(this.model, "change:model_url", () => {
+      this.model.loadModel();
     });
 
     this.listenTo(this.model, "change:stage_visible", () => {
