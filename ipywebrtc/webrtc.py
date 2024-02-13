@@ -785,10 +785,12 @@ class MagicCube(DOMWidget):
         A floating-point number representing the scaling factor of the object.
     model_url: string: ''
         A Unicode string representing the URL to a 3D model.
-    stage_visible: boolean: True
+    show_stage: boolean: True
         A boolean indicating whether the stage (background) is visible.
     stage_color: string: '#11111B'
         A Unicode string representing the color of the stage in hexadecimal format. Value must be in hexadecimal format.
+    show_edges: boolean: True
+        A boolean indicating whether the edges outlining the stage are visible.
 
     bg: Unicode: ''
         A Unicode string representing additional background information.
@@ -809,8 +811,9 @@ class MagicCube(DOMWidget):
     position = List([0, -1, 0]).tag(sync=True)
     scale = Float(1.0).tag(sync=True)
     model_url = Unicode().tag(sync=True)
-    stage_visible = Bool(True).tag(sync=True)
+    show_stage = Bool(True).tag(sync=True)
     stage_color = Unicode("#11111B").tag(sync=True)
+    show_edges = Bool(True).tag(sync=True)
 
     # TODO: remove?
     bg = Unicode().tag(sync=True)

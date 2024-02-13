@@ -17,14 +17,15 @@ export class MagicCubeModel extends DOMWidgetModel {
       _view_name: "MagicCubeView",
       _model_module_version: semver_range,
       _view_module_version: semver_range,
+      width: 640,
+      height: 480,
       scale: 1.0,
       position: [0, 0, 0],
       model_url:
         "https://github.khronos.org/glTF-Sample-Viewer-Release/assets/models/Models/Duck/glTF/Duck.gltf",
-      stage_visible: true,
+      show_stage: true,
       stage_color: "#11111B",
-      width: 640,
-      height: 480,
+      show_edges: true,
     };
   }
 
@@ -171,7 +172,49 @@ export class MagicCubeModel extends DOMWidgetModel {
 
     this.buildStage();
 
+    this.cubeEdges();
+
+    this.loadModel();
+
+    // fancy light
+    this.pointLight = new THREE.PointLight(0xffffff, 1, 50);
+    this.pointLight.position.set(0.5, 3, 2);
+    this.scene.add(this.pointLight);
+  }
+
+  buildStage() {
+    this.loader = new THREE.TextureLoader();
+
+    // TODO: Let user set image
+    this.stageTextureImage = this.get("bg") || blueBg;
+    this.stageTexture = this.loader.load(this.stageTextureImage);
+
+    // remove old model first
+    if (this.stage) {
+      this.removeFromScene(this.stage);
+      // this.stage.dispose();
+
+      // TODO: Move this part to removeFromScene() (also in loadModel())
+      this.stage.geometry.dispose();
+      this.stage.material.dispose();
+    }
+
+    // reversed cube
+    this.stageMesh = new THREE.MeshBasicMaterial({
+      // map: this.stageTexture,
+      color: this.get("stage_color"), //1a1b26
+      side: THREE.BackSide,
+    });
+
+    this.stage = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), this.stageMesh);
+    console.log("this.stage", this.stage);
+    this.sceneGroup.add(this.stage);
+  }
+
+  cubeEdges() {
     // cube edges
+    this.edgeGroup = new THREE.Group();
+
     this.edgeGeometry = new THREE.CylinderGeometry(0.03, 0.03, 2, 32);
 
     this.edgeCenters = [
@@ -215,44 +258,10 @@ export class MagicCubeModel extends DOMWidgetModel {
       edge.position.copy(this.edgeCenters[i]);
       edge.rotation.setFromVector3(this.edgeRotations[i]);
 
-      this.sceneGroup.add(edge);
+      this.edgeGroup.add(edge);
     }
 
-    this.loadModel();
-
-    // fancy light
-    this.pointLight = new THREE.PointLight(0xffffff, 1, 50);
-    this.pointLight.position.set(0.5, 3, 2);
-    this.scene.add(this.pointLight);
-  }
-
-  buildStage() {
-    this.loader = new THREE.TextureLoader();
-
-    // TODO: Let user set image
-    this.stageTextureImage = this.get("bg") || blueBg;
-    this.stageTexture = this.loader.load(this.stageTextureImage);
-
-    // remove old model first
-    if (this.stage) {
-      this.removeFromScene(this.stage);
-      // this.stage.dispose();
-
-      // TODO: Move this part to removeFromScene() (also in loadModel())
-      this.stage.geometry.dispose();
-      this.stage.material.dispose();
-    }
-
-    // reversed cube
-    this.stageMesh = new THREE.MeshBasicMaterial({
-      // map: this.stageTexture,
-      color: this.get("stage_color"), //1a1b26
-      side: THREE.BackSide,
-    });
-
-    this.stage = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), this.stageMesh);
-    console.log("this.stage", this.stage);
-    this.sceneGroup.add(this.stage);
+    this.sceneGroup.add(this.edgeGroup);
   }
 
   loadModel() {
@@ -417,8 +426,8 @@ export class MagicCubeView extends DOMWidgetView {
       this.model.loadModel();
     });
 
-    this.listenTo(this.model, "change:stage_visible", () => {
-      if (this.model.get("stage_visible")) {
+    this.listenTo(this.model, "change:show_stage", () => {
+      if (this.model.get("show_stage")) {
         this.model.stage.visible = true;
       } else {
         this.model.stage.visible = false;
@@ -427,6 +436,14 @@ export class MagicCubeView extends DOMWidgetView {
 
     this.listenTo(this.model, "change:stage_color", () => {
       this.model.buildStage();
+    });
+
+    this.listenTo(this.model, "change:show_edges", () => {
+      if (this.model.get("show_edges")) {
+        this.model.edgeGroup.visible = true;
+      } else {
+        this.model.edgeGroup.visible = false;
+      }
     });
   }
 }
