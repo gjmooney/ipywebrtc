@@ -779,6 +779,7 @@ class MagicCube(DOMWidget):
     scale = Float(1.0).tag(sync=True)
     model_url = Unicode().tag(sync=True)
     stage_visible = Bool(True).tag(sync=True)
+    stage_color = Unicode("#11111B").tag(sync=True)
 
     bg = Unicode().tag(sync=True)
 

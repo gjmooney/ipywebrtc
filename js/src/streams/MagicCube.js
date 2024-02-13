@@ -22,6 +22,7 @@ export class MagicCubeModel extends DOMWidgetModel {
       model_url:
         "https://github.khronos.org/glTF-Sample-Viewer-Release/assets/models/Models/Duck/glTF/Duck.gltf",
       stage_visible: true,
+      stage_color: "#11111B",
       width: 640,
       height: 480,
     };
@@ -52,7 +53,7 @@ export class MagicCubeModel extends DOMWidgetModel {
     // TODO: Add this as a python option
     // this.scene.background = new THREE.TextureLoader().load(blueBg);
 
-    this.ambientLight = new THREE.AmbientLight(0xcccccc, 0.5);
+    this.ambientLight = new THREE.AmbientLight(0x404040, 0.5);
     this.scene.add(this.ambientLight);
 
     this.camera = new THREE.Camera();
@@ -69,15 +70,18 @@ export class MagicCubeModel extends DOMWidgetModel {
       displayHeight: this.get("height"),
     });
 
-    this.arToolkitSource.init(function onReady() {
-      this.onResize();
-    });
+    // TODO: resize? Height of cell doesn't change on resize, so to maintain aspect ratio, width of video cant change either
+    this.arToolkitSource
+      .init
+      //function onReady() {this.onResize();}
+      ();
 
     // handle resize event
-    window.addEventListener("resize", function () {
-      console.log("setup source window listener");
-      this.onResize();
-    });
+    // window.addEventListener("resize", () => {
+    //   console.log("setup source window listener");
+    //   console.log("this-listener", this);
+    //   this.onResize();
+    // });
   }
 
   setupContext() {
@@ -165,21 +169,7 @@ export class MagicCubeModel extends DOMWidgetModel {
     // a 1x1x1 cube model with scale factor 1.25 fills up the physical cube
     this.sceneGroup.scale.set(1.75 / 2, 1.75 / 2, 1.75 / 2);
 
-    this.loader = new THREE.TextureLoader();
-
-    // TODO: Let user set image
-    this.stageTextureImage = this.get("bg") || blueBg;
-    this.stageTexture = this.loader.load(this.stageTextureImage);
-
-    // reversed cube
-    this.stage = new THREE.Mesh(
-      new THREE.BoxGeometry(2, 2, 2),
-      new THREE.MeshBasicMaterial({
-        map: this.stageTexture,
-        side: THREE.BackSide,
-      }),
-    );
-    this.sceneGroup.add(this.stage);
+    this.buildStage();
 
     // cube edges
     this.edgeGeometry = new THREE.CylinderGeometry(0.03, 0.03, 2, 32);
@@ -225,7 +215,7 @@ export class MagicCubeModel extends DOMWidgetModel {
       edge.position.copy(this.edgeCenters[i]);
       edge.rotation.setFromVector3(this.edgeRotations[i]);
 
-      this.stage.add(edge);
+      this.sceneGroup.add(edge);
     }
 
     this.loadModel();
@@ -236,26 +226,44 @@ export class MagicCubeModel extends DOMWidgetModel {
     this.scene.add(this.pointLight);
   }
 
+  buildStage() {
+    this.loader = new THREE.TextureLoader();
+
+    // TODO: Let user set image
+    this.stageTextureImage = this.get("bg") || blueBg;
+    this.stageTexture = this.loader.load(this.stageTextureImage);
+
+    // remove old model first
+    if (this.stage) {
+      this.removeFromScene(this.stage);
+    }
+
+    // reversed cube
+    this.stageMesh = new THREE.MeshBasicMaterial({
+      // map: this.stageTexture,
+      color: this.get("stage_color"), //1a1b26
+      side: THREE.BackSide,
+    });
+
+    this.stage = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), this.stageMesh);
+    this.sceneGroup.add(this.stage);
+  }
+
   loadModel() {
     // instantiate loader
-    console.log("start load");
     if (!this.gltfLoader) {
       this.gltfLoader = new GLTFLoader();
     }
-    console.log("start load 2");
 
     // remove old model first
     if (this.gltfModel) {
-      this.sceneGroup.remove(this.gltfModel);
+      this.removeFromScene(this.gltfModel);
     }
     // gltf model
-    console.log("start load 3");
 
     this.gltfLoader.load(
       this.get("model_url"),
       (gltf) => {
-        console.log("start load 4");
-
         let scale = this.get("scale");
         this.gltfModel = gltf.scene;
         console.log("gltf.scene", gltf.scene);
@@ -271,30 +279,23 @@ export class MagicCubeModel extends DOMWidgetModel {
         console.log("Error loading model", error);
       },
     );
-
-    console.log("start load 5");
   }
 
-  onResize() {
-    this.arToolkitSource.onResize();
-    // this.arToolkitSource.copySizeTo(this.renderer.domElement);
-    if (this.arToolkitContext.arController !== null) {
-      this.arToolkitSource.copySizeTo(
-        this.arToolkitContext.arController.canvas,
-      );
-    }
+  removeFromScene(object3d) {
+    this.sceneGroup.remove(object3d);
   }
 
-  close() {
-    if (this.cameraStream) {
-      this.cameraStream.then((stream) => {
-        stream.getTracks().forEach((track) => {
-          track.stop();
-        });
-      });
-    }
-    return super.close.apply(this, arguments);
-  }
+  // onResize() {
+  //   console.log("this-resize", this);
+
+  //   this.arToolkitSource.onResizeElement();
+  //   this.arToolkitSource.copySizeTo(this.renderer.domElement);
+  //   if (this.arToolkitContext.arController !== null) {
+  //     this.arToolkitSource.copySizeTo(
+  //       this.arToolkitContext.arController.canvas,
+  //     );
+  //   }
+  // }
 }
 
 MagicCubeModel.serializers = {
@@ -387,6 +388,10 @@ export class MagicCubeView extends DOMWidgetView {
       } else {
         this.model.stage.visible = false;
       }
+    });
+
+    this.listenTo(this.model, "change:stage_color", () => {
+      this.model.buildStage();
     });
   }
 }
