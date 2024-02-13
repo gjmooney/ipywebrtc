@@ -768,6 +768,33 @@ class Scene(DOMWidget):
 
 @register
 class MagicCube(DOMWidget):
+    """AR Cube
+
+    Display 3d models in AR
+    Needs the letter cube TODO: link to pattern here
+
+    Attributes:
+    ----------
+    width: Int: 640
+        An integer representing the width of the webcam resolution.
+    height: Int: 480
+        An integer representing the height of the webcam resolution.
+    position: tuple: [0, -1, 0]
+        A list representing the position of an object in 3D space. Values are x, y, z coordinates.
+    scale: float: 1.0
+        A floating-point number representing the scaling factor of the object.
+    model_url: string: ''
+        A Unicode string representing the URL to a 3D model.
+    stage_visible: boolean: True
+        A boolean indicating whether the stage (background) is visible.
+    stage_color: string: '#11111B'
+        A Unicode string representing the color of the stage in hexadecimal format. Value must be in hexadecimal format.
+
+    bg: Unicode: ''
+        A Unicode string representing additional background information.
+
+    """
+
     _model_module = Unicode("jupyter-webrtc").tag(sync=True)
     _view_module = Unicode("jupyter-webrtc").tag(sync=True)
     _model_name = Unicode("MagicCubeModel").tag(sync=True)
@@ -775,14 +802,15 @@ class MagicCube(DOMWidget):
     _view_module_version = Unicode("0.6.0").tag(sync=True)
     _model_module_version = Unicode("0.6.0").tag(sync=True)
 
+    # TODO: Used during camera initialization, don't sync?
+    width = Int(640).tag(sync=True)
+    height = Int(480).tag(sync=True)
+
     position = List([0, -1, 0]).tag(sync=True)
     scale = Float(1.0).tag(sync=True)
     model_url = Unicode().tag(sync=True)
     stage_visible = Bool(True).tag(sync=True)
     stage_color = Unicode("#11111B").tag(sync=True)
 
+    # TODO: remove?
     bg = Unicode().tag(sync=True)
-
-    # TODO: Used during camera initialization, don't sync?
-    width = Int(640).tag(sync=True)
-    height = Int(480).tag(sync=True)
