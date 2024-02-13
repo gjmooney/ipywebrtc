@@ -236,6 +236,11 @@ export class MagicCubeModel extends DOMWidgetModel {
     // remove old model first
     if (this.stage) {
       this.removeFromScene(this.stage);
+      // this.stage.dispose();
+
+      // TODO: Move this part to removeFromScene() (also in loadModel())
+      this.stage.geometry.dispose();
+      this.stage.material.dispose();
     }
 
     // reversed cube
@@ -246,6 +251,7 @@ export class MagicCubeModel extends DOMWidgetModel {
     });
 
     this.stage = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), this.stageMesh);
+    console.log("this.stage", this.stage);
     this.sceneGroup.add(this.stage);
   }
 
@@ -258,15 +264,33 @@ export class MagicCubeModel extends DOMWidgetModel {
     // remove old model first
     if (this.gltfModel) {
       this.removeFromScene(this.gltfModel);
-    }
-    // gltf model
 
+      // dispose geometries, materials, and textures associated with previous model
+      this.gltfModel.traverse((object) => {
+        if (object.isMesh) {
+          // Dispose of textures
+          if (object.material.map) {
+            object.material.map.dispose();
+          }
+          if (object.material.normalMap) {
+            object.material.normalMap.dispose();
+          }
+          // TODO: Add more texture types
+          object.geometry.dispose();
+          object.material.dispose();
+
+          // TODO: Handle ImageBitMaps
+        }
+      });
+    }
+
+    // load model
     this.gltfLoader.load(
       this.get("model_url"),
       (gltf) => {
         let scale = this.get("scale");
         this.gltfModel = gltf.scene;
-        console.log("gltf.scene", gltf.scene);
+        console.log("gltf", gltf);
         console.log("this.gltfModel", this.gltfModel);
         this.gltfModel.scale.set(scale, scale, scale);
         this.gltfModel.position.fromArray(this.get("position"));
@@ -280,6 +304,17 @@ export class MagicCubeModel extends DOMWidgetModel {
       },
     );
   }
+
+  // TODO: Handle ImageBitMaps
+  // disposeTexture(texture) {
+  //   if (texture instanceof THREE.Texture) {
+  //     texture.dispose();
+  //   } else if (texture instanceof ImageBitmap) {
+  //     // Dispose of ImageBitmap
+  //     texture.close();
+  //   }
+  //   // Add more conditions for other texture types as needed
+  // }
 
   removeFromScene(object3d) {
     this.sceneGroup.remove(object3d);
