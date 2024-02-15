@@ -26,16 +26,18 @@ export class MagicCubeModel extends DOMWidgetModel {
       show_stage: true,
       stage_color: "#11111B",
       show_edges: true,
+      fps_limit: 60,
     };
   }
 
   initialize(attributes, options) {
     super.initialize(attributes, options);
-    this.event_fired = new Promise((resolve) => {
+
+    // promise to track if AR.js has loaded the webcam
+    this.webcam_loaded = new Promise((resolve) => {
       this.resolve = resolve;
     });
 
-    // TODO: Should this be here or top level?
     window.addEventListener("arjs-video-loaded", (e) => {
       this.resolve();
     });
@@ -71,7 +73,7 @@ export class MagicCubeModel extends DOMWidgetModel {
       displayHeight: this.get("height"),
     });
 
-    // TODO: resize? Height of cell doesn't change on resize, so to maintain aspect ratio, width of video cant change either
+    // TODO: resize? Height of cell doesn't change on resize, so to maintain aspect ratio, width of video shouldn't change either
     this.arToolkitSource
       .init
       //function onReady() {this.onResize();}
@@ -192,7 +194,6 @@ export class MagicCubeModel extends DOMWidgetModel {
     // remove old model first
     if (this.stage) {
       this.removeFromScene(this.stage);
-      // this.stage.dispose();
 
       // TODO: Move this part to removeFromScene() (also in loadModel())
       this.stage.geometry.dispose();
@@ -207,7 +208,6 @@ export class MagicCubeModel extends DOMWidgetModel {
     });
 
     this.stage = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), this.stageMesh);
-    console.log("this.stage", this.stage);
     this.sceneGroup.add(this.stage);
   }
 
@@ -285,6 +285,7 @@ export class MagicCubeModel extends DOMWidgetModel {
             object.material.normalMap.dispose();
           }
           // TODO: Add more texture types
+
           object.geometry.dispose();
           object.material.dispose();
 
@@ -299,8 +300,6 @@ export class MagicCubeModel extends DOMWidgetModel {
       (gltf) => {
         let scale = this.get("scale");
         this.gltfModel = gltf.scene;
-        console.log("gltf", gltf);
-        console.log("this.gltfModel", this.gltfModel);
         this.gltfModel.scale.set(scale, scale, scale);
         this.gltfModel.position.fromArray(this.get("position"));
         this.sceneGroup.add(this.gltfModel);
@@ -352,37 +351,33 @@ export class MagicCubeView extends DOMWidgetView {
   async render() {
     // start time for FPS limit
     this.then = performance.now();
-
-    //TODO: set fps interval in model
-    this.fpsInterval = 1000 / 30;
+    this.fpsInterval = 1000 / this.model.get("fps_limit");
 
     // Check if webcam feed already exists
     this.webcamFromArjs = document.getElementById("arjs-video");
 
     // Wait for AR.js to set up webcam feed before rendering view
     if (!this.webcamFromArjs) {
-      await this.model.event_fired;
+      await this.model.webcam_loaded;
     }
 
     super.render();
 
     this.setupRenderer();
     this.inViewObserver();
-    this.model_events();
+    this.modelEvents();
 
     this.el.classList.add("ar-container");
 
     this.el.appendChild(this.renderer.domElement);
 
+    // Create new webcam element
     this.existingWebcam = document.getElementById("arjs-video");
     this.newWebcam = this.existingWebcam.cloneNode(true);
     this.newWebcam.srcObject = this.existingWebcam.srcObject;
     this.newWebcam.id = `webcamView${Object.keys(this.model.views).length}`;
     this.newWebcam.style.display = "";
-
     this.el.appendChild(this.newWebcam);
-
-    console.log("scene", "render");
   }
 
   setupRenderer() {
@@ -399,6 +394,10 @@ export class MagicCubeView extends DOMWidgetView {
   }
 
   animate() {
+    this.animationRequestId = window.requestAnimationFrame(
+      this.animate.bind(this),
+    );
+
     this.now = performance.now();
 
     // time elapsed since last frame
@@ -408,18 +407,15 @@ export class MagicCubeView extends DOMWidgetView {
     if (this.elapsed > this.fpsInterval) {
       this.then = this.now - (this.elapsed % this.fpsInterval);
 
-      this.animationRequestId = window.requestAnimationFrame(
-        this.animate.bind(this),
-      );
-
       this.update();
       this.renderer.render(this.model.scene, this.model.camera);
-    } else {
-      // If not enough time has elapsed, wait for the next frame
-      this.animationRequestId = window.requestAnimationFrame(
-        this.animate.bind(this),
-      );
     }
+    // else {
+    //   // If not enough time has elapsed, wait for the next frame
+    //   this.animationRequestId = window.requestAnimationFrame(
+    //     this.animate.bind(this),
+    //   );
+    // }
   }
 
   // Stop animation loop if view is not in viewport
@@ -450,7 +446,7 @@ export class MagicCubeView extends DOMWidgetView {
     }
   }
 
-  model_events() {
+  modelEvents() {
     this.listenTo(this.model, "change:position", () => {
       this.model.gltfModel.position.fromArray(this.model.get("position"));
     });

@@ -791,6 +791,8 @@ class MagicCube(DOMWidget):
         A Unicode string representing the color of the stage in hexadecimal format. Value must be in hexadecimal format.
     show_edges: boolean: True
         A boolean indicating whether the edges outlining the stage are visible.
+    fps_limit: integer: 60
+        Set FPS limit of animation loop
 
     bg: Unicode: ''
         A Unicode string representing additional background information.
@@ -814,6 +816,7 @@ class MagicCube(DOMWidget):
     show_stage = Bool(True).tag(sync=True)
     stage_color = Unicode("#11111B").tag(sync=True)
     show_edges = Bool(True).tag(sync=True)
+    fps_limit = Int(60).tag(sync=True)
 
     # TODO: remove?
     bg = Unicode().tag(sync=True)
