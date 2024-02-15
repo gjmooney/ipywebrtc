@@ -286,13 +286,11 @@ export class MagicCubeModel extends DOMWidgetModel {
         console.log("this.gltfModel", this.gltfModel);
         this.animations = gltf.animations;
         this.mixer = new THREE.AnimationMixer(this.gltfModel);
-        this.clip = THREE.AnimationClip.findByName(
-          this.animations,
-          "animation_0",
-        );
-        this.action = this.mixer.clipAction(this.clip);
-        if (this.action) {
-          this.action.play();
+
+        if (this.animations) {
+          this.animations.forEach((clip) => {
+            this.mixer.clipAction(clip).play();
+          });
         }
 
         this.sceneGroup.add(this.gltfModel);
@@ -304,8 +302,6 @@ export class MagicCubeModel extends DOMWidgetModel {
         console.log("Error loading model", error);
       },
     );
-
-    // this.clips = this.gltfModel.animations;
   }
 
   // TODO: Handle ImageBitMaps
@@ -425,13 +421,9 @@ export class MagicCubeView extends DOMWidgetView {
     if (this.elapsed > this.fpsInterval) {
       this.then = this.now - (this.elapsed % this.fpsInterval);
 
-      // this.model.action.play();
       this.update();
       this.model.mixer.update(this.mixerUpdateDelta);
 
-      // this.model.animations.forEach((clip) => {
-      //   this.model.mixer.clipAction(clip).play();
-      // });
       this.renderer.render(this.model.scene, this.model.camera);
     }
   }
