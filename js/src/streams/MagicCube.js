@@ -51,6 +51,7 @@ export class MagicCubeModel extends DOMWidgetModel {
   }
 
   setupThreeStuff() {
+    this.clock = new THREE.Clock();
     this.scene = new THREE.Scene();
 
     // TODO: Add this as a python option
@@ -279,6 +280,21 @@ export class MagicCubeModel extends DOMWidgetModel {
         this.gltfModel = gltf.scene;
         this.gltfModel.scale.set(scale, scale, scale);
         this.gltfModel.position.fromArray(this.get("position"));
+
+        console.log("gltf", gltf);
+
+        console.log("this.gltfModel", this.gltfModel);
+        this.animations = gltf.animations;
+        this.mixer = new THREE.AnimationMixer(this.gltfModel);
+        this.clip = THREE.AnimationClip.findByName(
+          this.animations,
+          "animation_0",
+        );
+        this.action = this.mixer.clipAction(this.clip);
+        if (this.action) {
+          this.action.play();
+        }
+
         this.sceneGroup.add(this.gltfModel);
       },
       () => {
@@ -288,6 +304,8 @@ export class MagicCubeModel extends DOMWidgetModel {
         console.log("Error loading model", error);
       },
     );
+
+    // this.clips = this.gltfModel.animations;
   }
 
   // TODO: Handle ImageBitMaps
@@ -395,16 +413,25 @@ export class MagicCubeView extends DOMWidgetView {
       this.animate.bind(this),
     );
 
+    this.mixerUpdateDelta = this.model.clock.getDelta();
+
     this.now = performance.now();
 
     // time elapsed since last frame
+    // TODO: I think I can use getDelta from the three clock here maybe?
     this.elapsed = this.now - this.then;
 
     // if enough time has passed to render the next frame
     if (this.elapsed > this.fpsInterval) {
       this.then = this.now - (this.elapsed % this.fpsInterval);
 
+      // this.model.action.play();
       this.update();
+      this.model.mixer.update(this.mixerUpdateDelta);
+
+      // this.model.animations.forEach((clip) => {
+      //   this.model.mixer.clipAction(clip).play();
+      // });
       this.renderer.render(this.model.scene, this.model.camera);
     }
   }
