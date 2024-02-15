@@ -350,6 +350,12 @@ export class MagicCubeView extends DOMWidgetView {
   // base url = https://ar-js-org.github.io/AR.js/three.js/
 
   async render() {
+    // start time for FPS limit
+    this.then = performance.now();
+
+    //TODO: set fps interval in model
+    this.fpsInterval = 1000 / 30;
+
     // Check if webcam feed already exists
     this.webcamFromArjs = document.getElementById("arjs-video");
 
@@ -393,12 +399,27 @@ export class MagicCubeView extends DOMWidgetView {
   }
 
   animate() {
-    this.animationRequestId = window.requestAnimationFrame(
-      this.animate.bind(this),
-    );
+    this.now = performance.now();
 
-    this.update();
-    this.renderer.render(this.model.scene, this.model.camera);
+    // time elapsed since last frame
+    this.elapsed = this.now - this.then;
+
+    // if enough time has passed to render the next frame
+    if (this.elapsed > this.fpsInterval) {
+      this.then = this.now - (this.elapsed % this.fpsInterval);
+
+      this.animationRequestId = window.requestAnimationFrame(
+        this.animate.bind(this),
+      );
+
+      this.update();
+      this.renderer.render(this.model.scene, this.model.camera);
+    } else {
+      // If not enough time has elapsed, wait for the next frame
+      this.animationRequestId = window.requestAnimationFrame(
+        this.animate.bind(this),
+      );
+    }
   }
 
   // Stop animation loop if view is not in viewport
