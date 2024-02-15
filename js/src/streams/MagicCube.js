@@ -194,10 +194,6 @@ export class MagicCubeModel extends DOMWidgetModel {
     // remove old model first
     if (this.stage) {
       this.removeFromScene(this.stage);
-
-      // TODO: Move this part to removeFromScene() (also in loadModel())
-      this.stage.geometry.dispose();
-      this.stage.material.dispose();
     }
 
     // reversed cube
@@ -273,25 +269,6 @@ export class MagicCubeModel extends DOMWidgetModel {
     // remove old model first
     if (this.gltfModel) {
       this.removeFromScene(this.gltfModel);
-
-      // dispose geometries, materials, and textures associated with previous model
-      this.gltfModel.traverse((object) => {
-        if (object.isMesh) {
-          // Dispose of textures
-          if (object.material.map) {
-            object.material.map.dispose();
-          }
-          if (object.material.normalMap) {
-            object.material.normalMap.dispose();
-          }
-          // TODO: Add more texture types
-
-          object.geometry.dispose();
-          object.material.dispose();
-
-          // TODO: Handle ImageBitMaps
-        }
-      });
     }
 
     // load model
@@ -324,8 +301,29 @@ export class MagicCubeModel extends DOMWidgetModel {
   //   // Add more conditions for other texture types as needed
   // }
 
+  // dispose geometries, materials, and textures associated with previous model
   removeFromScene(object3d) {
     this.sceneGroup.remove(object3d);
+
+    object3d.traverse((object) => {
+      if (object.isMesh) {
+        // Dispose of textures
+        if (object.material.map) {
+          object.material.map.dispose();
+        }
+        if (object.material.normalMap) {
+          object.material.normalMap.dispose();
+        }
+        // TODO: Add more texture types
+
+        console.log("remove geometry");
+        object.geometry.dispose();
+        console.log("remove material");
+        object.material.dispose();
+
+        // TODO: Handle ImageBitMaps
+      }
+    });
   }
 
   // onResize() {
@@ -346,8 +344,6 @@ MagicCubeModel.serializers = {
 };
 
 export class MagicCubeView extends DOMWidgetView {
-  // base url = https://ar-js-org.github.io/AR.js/three.js/
-
   async render() {
     // start time for FPS limit
     this.then = performance.now();
@@ -410,12 +406,6 @@ export class MagicCubeView extends DOMWidgetView {
       this.update();
       this.renderer.render(this.model.scene, this.model.camera);
     }
-    // else {
-    //   // If not enough time has elapsed, wait for the next frame
-    //   this.animationRequestId = window.requestAnimationFrame(
-    //     this.animate.bind(this),
-    //   );
-    // }
   }
 
   // Stop animation loop if view is not in viewport
