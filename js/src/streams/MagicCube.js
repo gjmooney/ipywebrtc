@@ -308,17 +308,18 @@ export class MagicCubeModel extends DOMWidgetModel {
     object3d.traverse((object) => {
       if (object.isMesh) {
         // Dispose of textures
+        for (const key in object.material) {
+          if (key.endsWith("Map") && object.material[key]) {
+            object.material[key].dispose();
+          }
+        }
+
+        // this is the only one with a lower case m so let's just toss it in
         if (object.material.map) {
           object.material.map.dispose();
         }
-        if (object.material.normalMap) {
-          object.material.normalMap.dispose();
-        }
-        // TODO: Add more texture types
 
-        console.log("remove geometry");
         object.geometry.dispose();
-        console.log("remove material");
         object.material.dispose();
 
         // TODO: Handle ImageBitMaps
@@ -430,7 +431,7 @@ export class MagicCubeView extends DOMWidgetView {
     for (let i = 0; i < 6; i++) {
       if (this.model.markerRootArray[i].visible) {
         this.model.markerGroupArray[i].add(this.model.sceneGroup);
-        console.log("visible: " + this.model.patternArray[i]);
+        // console.log("visible: " + this.model.patternArray[i]);
         break;
       }
     }
