@@ -359,8 +359,9 @@ export class MagicCubeView extends DOMWidgetView {
     }
 
     super.render();
+
     this.setupRenderer();
-    this.animate();
+    this.inViewObserver();
     this.model_events();
 
     this.el.classList.add("ar-container");
@@ -392,10 +393,26 @@ export class MagicCubeView extends DOMWidgetView {
   }
 
   animate() {
-    window.requestAnimationFrame(this.animate.bind(this));
+    this.animationRequestId = window.requestAnimationFrame(
+      this.animate.bind(this),
+    );
 
     this.update();
     this.renderer.render(this.model.scene, this.model.camera);
+  }
+
+  // Stop animation loop if view is not in viewport
+  inViewObserver() {
+    this.observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        this.animate();
+      } else {
+        window.cancelAnimationFrame(this.animationRequestId);
+        this.animationRequestId = undefined;
+      }
+    });
+
+    this.observer.observe(this.el);
   }
 
   update() {
